@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:background="@color/oldGloryBlue">
+
+    <ImageView android:id="@+id/list_view_portrait"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/lee"/>
+
+    <TextView android:id="@+id/list_view_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_toRightOf="@id/list_view_portrait"
+        android:layout_alignParentTop="true"
+
+        android:singleLine="true"
+        android:gravity="center_vertical"
+        android:text="Rep. Barbara L. Lee - D" />
+
+    <TextView android:id="@+id/list_view_website"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_toRightOf="@id/list_view_portrait"
+        android:layout_below="@id/list_view_name"
+
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:text="lee.house.gov" />
+
+    <TextView android:id="@+id/list_view_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_toRightOf="@id/list_view_website"
+        android:layout_below="@id/list_view_name"
+
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:text="repbarbaralee@gmail.com" />
+
+    <TextView android:id="@+id/list_view_tweet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:layout_toRightOf="@id/list_view_portrait"
+        android:layout_below="@id/list_view_website"
+        android:layout_alignParentBottom="true"
+
+        android:text="lee.house.gov" />
+
+    <ImageButton android:id="@+id/list_view_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

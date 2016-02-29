@@ -2,6 +2,7 @@ package com.erchpito.represent;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -62,6 +63,7 @@ public class Representative implements Parcelable {
     private Representative(Parcel in) {
         this();
         mFirstName = in.readString();
+        Log.d("Rep", mFirstName);
         mLastName = in.readString();
         mMiddleName = in.readString();
         mPortrait = in.readInt();
@@ -90,7 +92,7 @@ public class Representative implements Parcelable {
         out.writeString(mEndTerm);
         out.writeString(mParty);
         out.writeStringList(mCommittees);
-        out.writeList(mBills);
+        out.writeTypedList(mBills);
     }
 
     @Override

@@ -92,15 +92,15 @@ public class CongressionalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_congressional);
 
-        Intent intent = getIntent();
-        mLocation = intent.getStringExtra(MainActivity.LOCATION);
-        mDistrict = intent.getStringExtra(MainActivity.DISTRICT);
-        mRepresentatives = intent.getParcelableExtra(MainActivity.REPRESENTATIVES);
+        Bundle bundle = getIntent().getExtras();
+        mLocation = bundle.getString(MainActivity.LOCATION);
+        mDistrict = bundle.getString(MainActivity.DISTRICT);
+        mRepresentatives = bundle.getParcelableArrayList(MainActivity.REPRESENTATIVES);
 
-        mLocationText = (EditText) findViewById(R.id.location_text);
+        mLocationText = (TextView) findViewById(R.id.location_text);
         mLocationText.setText(mLocation);
 
-        mDistrictText = (EditText) findViewById(R.id.district_text);
+        mDistrictText = (TextView) findViewById(R.id.district_text);
         mDistrictText.setText(mDistrict);
 
         mRepresentativeList = (ListView) findViewById(R.id.representative_list);

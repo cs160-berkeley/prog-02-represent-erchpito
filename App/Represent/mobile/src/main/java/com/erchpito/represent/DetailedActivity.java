@@ -28,8 +28,8 @@ public class DetailedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed);
 
-        Intent intent = getIntent();
-        mRepresentative = intent.getParcelableExtra(CongressionalActivity.REPRESENTATIVE);
+        Bundle bundle = getIntent().getExtras();
+        mRepresentative = bundle.getParcelable(CongressionalActivity.REPRESENTATIVE);
 
         mPortraitImage = (ImageView) findViewById(R.id.portrait_image);
         mNameText = (TextView) findViewById(R.id.name_text);

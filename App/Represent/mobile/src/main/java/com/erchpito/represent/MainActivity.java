@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     public final static String LOCATION = "com.erchpito.represent.LOCATION";
     public final static String DISTRICT = "com.erchpito.represent.DISTRICT";
-    public final static String REPRESENTATIVES = "com.erchpito.represent.DISTRICT";
+    public final static String REPRESENTATIVES = "com.erchpito.represent.REPRESENTATIVES";
 
     private int mLocation;
     private String mDistrict;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         loadRepresentatives();
         Intent intent = new Intent(this, CongressionalActivity.class);
         intent.putExtra(LOCATION, "CA, " + mLocation);
+        Log.d(TAG, "CA, " + mLocation);
         intent.putExtra(DISTRICT, mDistrict);
         intent.putExtra(REPRESENTATIVES, mRepresentatives);
         startActivity(intent);
