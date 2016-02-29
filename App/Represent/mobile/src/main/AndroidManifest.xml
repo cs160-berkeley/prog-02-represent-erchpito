@@ -20,6 +20,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".CongressionalActivity"
+            android:label="@string/title_activity_congressional"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".DetailedActivity"
+            android:label="@string/title_activity_detailed"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
