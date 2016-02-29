@@ -1,6 +1,8 @@
 package com.erchpito.represent;
 
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,10 +22,12 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
     public final static String LOCATION = "com.erchpito.represent.LOCATION";
     public final static String DISTRICT = "com.erchpito.represent.DISTRICT";
     public final static String REPRESENTATIVES = "com.erchpito.represent.REPRESENTATIVES";
 
+    private Typeface font;
     private int mLocation;
     private String mDistrict;
     private ArrayList<Representative> mRepresentatives;
@@ -36,8 +40,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        font = Typeface.createFromAsset(getAssets(), "fonts/LeagueSpartan-Bold.otf");
+
         mZipButton = (Button) findViewById(R.id.zip_button);
+        mZipButton.setTypeface(font);
+
         mCurrentButton = (Button) findViewById(R.id.current_button);
+        mCurrentButton.setTypeface(font);
     }
 
     public void enterLocation(View view) {

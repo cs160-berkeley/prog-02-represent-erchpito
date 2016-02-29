@@ -23,6 +23,7 @@
 
         android:singleLine="true"
         android:gravity="center_vertical"
+        android:textSize="15dp"
         android:text="Rep. Barbara L. Lee - D" />
 
     <TextView android:id="@+id/list_view_website"
@@ -33,6 +34,7 @@
         android:layout_below="@id/list_view_name"
 
         android:singleLine="true"
+        android:textSize="8dp"
         android:ellipsize="marquee"
         android:text="lee.house.gov" />
 
@@ -44,6 +46,7 @@
         android:layout_below="@id/list_view_name"
 
         android:singleLine="true"
+        android:textSize="8dp"
         android:ellipsize="marquee"
         android:text="repbarbaralee@gmail.com" />
 
@@ -55,6 +58,7 @@
         android:layout_below="@id/list_view_website"
         android:layout_alignParentBottom="true"
 
+        android:textSize="8dp"
         android:text="lee.house.gov" />
 
     <ImageButton android:id="@+id/list_view_button"

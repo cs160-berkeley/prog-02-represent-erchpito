@@ -2,6 +2,7 @@ package com.erchpito.represent;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,8 +30,10 @@ import java.util.Arrays;
 public class CongressionalActivity extends AppCompatActivity {
 
     private static final String TAG = "CongressionalActivity";
+
     public final static String REPRESENTATIVE = "com.erchpito.represent.REPRESENTATIVE";
 
+    private Typeface font;
     private String mLocation;
     private String mDistrict;
     private ArrayList<Representative> mRepresentatives;
@@ -57,9 +60,17 @@ public class CongressionalActivity extends AppCompatActivity {
             }
 
             TextView name = (TextView) convertView.findViewById(R.id.list_view_name);
+            name.setTypeface(font);
+
             TextView website = (TextView) convertView.findViewById(R.id.list_view_website);
+            website.setTypeface(font);
+
             TextView email = (TextView) convertView.findViewById(R.id.list_view_email);
+            email.setTypeface(font);
+
             TextView tweet = (TextView) convertView.findViewById(R.id.list_view_tweet);
+            tweet.setTypeface(font);
+
             ImageView portrait = (ImageView) convertView.findViewById(R.id.list_view_portrait);
             ImageButton button = (ImageButton) convertView.findViewById(R.id.list_view_button);
 
@@ -92,6 +103,8 @@ public class CongressionalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_congressional);
 
+        font = Typeface.createFromAsset(getAssets(), "fonts/LeagueSpartan-Bold.otf");
+
         Bundle bundle = getIntent().getExtras();
         mLocation = bundle.getString(MainActivity.LOCATION);
         mDistrict = bundle.getString(MainActivity.DISTRICT);
@@ -99,9 +112,11 @@ public class CongressionalActivity extends AppCompatActivity {
 
         mLocationText = (TextView) findViewById(R.id.location_text);
         mLocationText.setText(mLocation);
+        mLocationText.setTypeface(font);
 
         mDistrictText = (TextView) findViewById(R.id.district_text);
         mDistrictText.setText(mDistrict);
+        mDistrictText.setTypeface(font);
 
         mRepresentativeList = (ListView) findViewById(R.id.representative_list);
         mRepresentativeAdapter = new RepresentativeArrayAdapter(this);
