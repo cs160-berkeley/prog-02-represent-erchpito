@@ -4,34 +4,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.erchpito.common.Representative;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class CongressionalActivity extends AppCompatActivity {
 
     private static final String TAG = "CongressionalActivity";
-
-    public final static String REPRESENTATIVE = "com.erchpito.represent.REPRESENTATIVE";
 
     private Typeface font;
     private String mLocation;
@@ -88,7 +78,7 @@ public class CongressionalActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(mContext, DetailedActivity.class);
-                    intent.putExtra(REPRESENTATIVE, rep);
+                    intent.putExtra("REPRESENTATIVE", rep);
                     Log.d(TAG, "Starting Detailed View");
                     startActivity(intent);
                 }
@@ -106,9 +96,9 @@ public class CongressionalActivity extends AppCompatActivity {
         font = Typeface.createFromAsset(getAssets(), "fonts/LeagueSpartan-Bold.otf");
 
         Bundle bundle = getIntent().getExtras();
-        mLocation = bundle.getString(MainActivity.LOCATION);
-        mDistrict = bundle.getString(MainActivity.DISTRICT);
-        mRepresentatives = bundle.getParcelableArrayList(MainActivity.REPRESENTATIVES);
+        mLocation = bundle.getString("LOCATION");
+        mDistrict = bundle.getString("DISTRICT");
+        mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
 
         mLocationText = (TextView) findViewById(R.id.location_text);
         mLocationText.setText(mLocation);

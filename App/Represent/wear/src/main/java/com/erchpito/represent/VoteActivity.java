@@ -15,23 +15,5 @@ public class VoteActivity extends WearableActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vote);
-
-        mFeedBtn = (Button) findViewById(R.id.feed_btn);
-
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-
-        if (extras != null) {
-            String catName = extras.getString("CAT_NAME");
-            mFeedBtn.setText("Feed " + catName);
-        }
-
-        mFeedBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent sendIntent = new Intent(getBaseContext(), WatchToPhoneService.class);
-                startService(sendIntent);
-            }
-        });
     }
 }

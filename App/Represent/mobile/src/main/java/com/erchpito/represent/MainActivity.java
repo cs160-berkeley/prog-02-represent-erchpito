@@ -1,35 +1,27 @@
 package com.erchpito.represent;
 
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
+
+import com.erchpito.common.Representative;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    public final static String LOCATION = "com.erchpito.represent.LOCATION";
-    public final static String DISTRICT = "com.erchpito.represent.DISTRICT";
-    public final static String REPRESENTATIVES = "com.erchpito.represent.REPRESENTATIVES";
-
     private Typeface font;
     private int mLocation;
     private String mDistrict;
+    private String mCounty;
+    private ArrayList<String> mCandidates;
+    private ArrayList<Double> mPercentages;
     private ArrayList<Representative> mRepresentatives;
 
     private Button mZipButton;
@@ -52,6 +44,13 @@ public class MainActivity extends AppCompatActivity {
     public void enterLocation(View view) {
         mLocation = 94704;
         mDistrict = "13th Congressional District";
+        mCounty = "Alameda County, CA";
+        mCandidates = new ArrayList<String>();
+        mCandidates.add("Obama");
+        mCandidates.add("Romney");
+        mPercentages = new ArrayList<Double>();
+        mPercentages.add(78.9);
+        mPercentages.add(18.2);
         toCongressionalView();
     }
 
@@ -59,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         // make EditText view
         mLocation = 94704;
         mDistrict = "13th Congressional District";
+        mCounty = "Alameda County, CA";
         toCongressionalView();
     }
 
@@ -110,10 +110,18 @@ public class MainActivity extends AppCompatActivity {
     public void toCongressionalView() {
         loadRepresentatives();
         Intent intent = new Intent(this, CongressionalActivity.class);
-        intent.putExtra(LOCATION, "CA, " + mLocation);
-        Log.d(TAG, "CA, " + mLocation);
-        intent.putExtra(DISTRICT, mDistrict);
-        intent.putExtra(REPRESENTATIVES, mRepresentatives);
+        intent.putExtra("LOCATION", "CA, " + mLocation);
+        intent.putExtra("DISTRICT", mDistrict);
+        intent.putExtra("REPRESENTATIVES", mRepresentatives);
         startActivity(intent);
+
+        Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
+        serviceIntent.putExtra("LOCATION", "CA, " + mLocation);
+        serviceIntent.putExtra("DISTRICT", mDistrict);
+        serviceIntent.putExtra("REPRESENTATIVES", mRepresentatives);
+        serviceIntent.putExtra("COUNTY", mCounty);
+        serviceIntent.putExtra("CANDIDATES", mCandidates);
+        serviceIntent.putExtra("PERCENTAGES", mPercentages);
+        startService(serviceIntent);
     }
 }
