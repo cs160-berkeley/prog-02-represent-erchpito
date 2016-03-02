@@ -138,6 +138,7 @@ public class Representative implements Parcelable {
     }
 
     public String getMyName() {
+        // assumes a middle name
         return mFirstName + " " + mMiddleName.substring(0, 1) + ". " + mLastName;
     }
 

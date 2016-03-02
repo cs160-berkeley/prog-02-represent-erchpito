@@ -53,7 +53,6 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
             @Override
             public void run() {
                 mApiClient.connect();
-//                sendMessage("/wearable_data", "potato");
 
                 PutDataMapRequest putDMR = PutDataMapRequest.create("/wearable_data");
                 putDMR.getDataMap().putAll(DATAMAP);
@@ -100,17 +99,4 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) { ; }
 
-
-//    private void sendMessage( final String path, final String text ) {
-//        new Thread( new Runnable() {
-//            @Override
-//            public void run() {
-//                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mApiClient).await();
-//                for(Node node : nodes.getNodes()) {
-//                    MessageApi.SendMessageResult result = Wearable.MessageApi
-//                            .sendMessage(mApiClient, node.getId(), path, text.getBytes()).await();
-//                }
-//            }
-//        }).start();
-//    }
 }

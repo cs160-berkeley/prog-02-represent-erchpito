@@ -7,39 +7,96 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.erchpito.common.Representative;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class PhoneListenerService extends WearableListenerService {
 
-    //   WearableListenerServices don't need an iBinder or an onStartCommand: they just need an onMessageReceieved.
-    private static final String TOAST = "/send_toast";
+    private static final String TAG = "PhoneListenerService";
+
+//    @Override
+//    public void onMessageReceived(MessageEvent messageEvent) {
+//        Log.d("T", "in PhoneListenerService, got: " + messageEvent.getPath());
+//        if( messageEvent.getPath().equalsIgnoreCase("/handheld_data_random") ) {
+//
+//            int zipcode = RepresentCalculator.findRandomZipCode();
+//            String location = RepresentCalculator.findLocation(zipcode);
+//            String district = RepresentCalculator.findCongressionalDistrict(zipcode);
+//            String county = RepresentCalculator.findCounty(zipcode);
+//            ArrayList<String> votes = RepresentCalculator.find2012Vote(zipcode);
+//            ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
+//
+//            Intent intent = new Intent(this, CongressionalActivity.class);
+//            intent.putExtra("LOCATION", location);
+//            intent.putExtra("DISTRICT", district);
+//            intent.putExtra("REPRESENTATIVES", representatives);
+//            startActivity(intent);
+//
+//            Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
+//            serviceIntent.putExtra("LOCATION", location);
+//            serviceIntent.putExtra("DISTRICT", district);
+//            serviceIntent.putExtra("REPRESENTATIVES", representatives);
+//            serviceIntent.putExtra("COUNTY", county);
+//            serviceIntent.putExtra("VOTES", votes);
+//            startService(serviceIntent);
+//
+//        } else {
+//            super.onMessageReceived( messageEvent );
+//        }
+//
+//    }
 
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        Log.d("T", "in PhoneListenerService, got: " + messageEvent.getPath());
-        if( messageEvent.getPath().equalsIgnoreCase(TOAST) ) {
+    public void onDataChanged(DataEventBuffer dataEvents) {
 
-            // Value contains the String we sent over in WatchToPhoneService, "good job"
-            String value = new String(messageEvent.getData(), StandardCharsets.UTF_8);
+        DataMap dataMap;
 
-            // Make a toast with the String
-            Context context = getApplicationContext();
-            int duration = Toast.LENGTH_SHORT;
+        for (DataEvent event : dataEvents) {
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+                String path = event.getDataItem().getUri().getPath();
+                if (path.equals("/handheld_data_random")) {
 
-            Toast toast = Toast.makeText(context, value, duration);
-            toast.show();
+                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    Log.d(TAG, "DataMap received on watch: " + dataMap);
 
-            // so you may notice this crashes the phone because it's
-            //''sending message to a Handler on a dead thread''... that's okay. but don't do this.
-            // replace sending a toast with, like, starting a new activity or something.
-            // who said skeleton code is untouchable? #breakCSconceptions
+                    int zipcode = RepresentCalculator.findRandomZipCode();
+                    String location = RepresentCalculator.findLocation(zipcode);
+                    String district = RepresentCalculator.findCongressionalDistrict(zipcode);
+                    String county = RepresentCalculator.findCounty(zipcode);
+                    ArrayList<String> votes = RepresentCalculator.find2012Vote(zipcode);
+                    ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
 
-        } else {
-            super.onMessageReceived( messageEvent );
+                    Intent intent = new Intent(this, CongressionalActivity.class);
+                    intent.putExtra("LOCATION", location);
+                    intent.putExtra("DISTRICT", district);
+                    intent.putExtra("REPRESENTATIVES", representatives);
+                    startActivity(intent);
+
+                    Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
+                    serviceIntent.putExtra("LOCATION", location);
+                    serviceIntent.putExtra("DISTRICT", district);
+                    serviceIntent.putExtra("REPRESENTATIVES", representatives);
+                    serviceIntent.putExtra("COUNTY", county);
+                    serviceIntent.putExtra("VOTES", votes);
+                    startService(serviceIntent);
+
+                } else if (path.equals("/handheld_data_detailed")) {
+
+//                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+//                    Log.d(TAG, "DataMap received on watch: " + dataMap);
+//                    Intent intent = new Intent(this, DetailedActivity.class);
+//                    intent.putExtra("REPRESENTATIVE", rep);
+//                    startActivity(intent);
+                }
+            }
         }
-
     }
 }

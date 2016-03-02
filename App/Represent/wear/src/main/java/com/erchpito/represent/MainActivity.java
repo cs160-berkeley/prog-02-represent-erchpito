@@ -210,14 +210,14 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         if (accelersum == -1) {
             accelersum = localAccelersum;
         }
-//        Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
-//        serviceIntent.putExtra("RANDOM", "random");
-//        startService(serviceIntent);
 
         if (accelersum != localAccelersum && !mLocationText.getText().equals("SHAKE")) {
             accelersum = localAccelersum;
             mLocationText.setText("SHAKE");
             mDistrictText.setText("");
+
+            Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
+            startService(serviceIntent);
 
             mLocationField.setAlpha(0f);
             mLocationField.setVisibility(View.VISIBLE);
