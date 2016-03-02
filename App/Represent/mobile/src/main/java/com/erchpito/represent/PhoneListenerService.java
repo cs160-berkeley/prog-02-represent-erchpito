@@ -65,7 +65,7 @@ public class PhoneListenerService extends WearableListenerService {
                 if (path.equals("/handheld_data_random")) {
 
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                    Log.d(TAG, "DataMap received on watch: " + dataMap);
+                    Log.d(TAG, "DataMap received on phone: " + dataMap);
 
                     int zipcode = RepresentCalculator.findRandomZipCode();
                     String location = RepresentCalculator.findLocation(zipcode);
@@ -78,6 +78,7 @@ public class PhoneListenerService extends WearableListenerService {
                     intent.putExtra("LOCATION", location);
                     intent.putExtra("DISTRICT", district);
                     intent.putExtra("REPRESENTATIVES", representatives);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
 
                     Intent serviceIntent = new Intent(this, PhoneToWatchService.class);

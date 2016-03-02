@@ -121,6 +121,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         if (bundle != null) {
             mLocation = bundle.getString("LOCATION");
             mDistrict = bundle.getString("DISTRICT");
+            Log.d(TAG, mDistrict);
             mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
         } else {
             mLocation = "CA, 94704";
@@ -186,6 +187,16 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 //        intent.putExtra("CANDIDATES", bundle.getParcelableArrayList("CANDIDATES"));
 //        intent.putExtra("PERCENTAGES", bundle.getParcelableArrayList("PERCENTAGES"));
 //        startService(intent);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null) {
+            Log.d(TAG, bundle.getString("DISTRICT"));
+        }
     }
 
     @Override
