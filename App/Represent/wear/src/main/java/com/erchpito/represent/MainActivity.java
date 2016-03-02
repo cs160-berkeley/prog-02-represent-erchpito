@@ -1,14 +1,24 @@
 package com.erchpito.represent;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.view.MotionEventCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -26,16 +36,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends WearableActivity implements WearableListView.ClickListener {
+public class MainActivity extends WearableActivity implements WearableListView.ClickListener, SensorEventListener {
 
     private static final String TAG = "WearMainActivity";
 
+    private int mShortAnimationDuration;
     private Typeface font;
     private String mLocation;
     private String mDistrict;
+    private double accelersum;
     private ArrayList<Representative> mRepresentatives;
 
     private RepresentativeAdapter mRepresentativeAdapter;
+    private GestureDetector mDetector;
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
 
     private WearableListView mRepresentativeList;
     private RelativeLayout mLocationField;
@@ -101,20 +116,23 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 
         font = Typeface.createFromAsset(getAssets(), "fonts/LeagueSpartan-Bold.otf");
 
-//        Bundle bundle = getIntent().getExtras();
+        Bundle bundle = getIntent().getExtras();
 
-        // if there's a chance it can be null
+//         if there's a chance it can be null
 //        if (bundle != null) {
 //            bundle.getString();
 //        }
 
-//        mLocation = bundle.getString("LOCATION");
-//        mDistrict = bundle.getString("DISTRICT");
-//        mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
+        mLocation = bundle.getString("LOCATION");
+        mDistrict = bundle.getString("DISTRICT");
+        mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
 
-        mLocation = "CA, 94704";
-        mDistrict = "13th Congressional District";
-        loadRepresentatives();
+//        mLocation = "CA, 94704";
+//        mDistrict = "13th Congressional District";
+//        loadRepresentatives();
+        mShortAnimationDuration = getResources().getInteger(android.R.integer.config_longAnimTime);
+
+        accelersum = -1.0;
 
         mLocationText = (TextView) findViewById(R.id.location_text);
         mLocationText.setText(mLocation);
@@ -125,37 +143,126 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         mDistrictText.setTypeface(font);
 
         mLocationField = (RelativeLayout) findViewById(R.id.field);
+        mLocationField.setVisibility(View.VISIBLE);
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         mRepresentativeList = (WearableListView) findViewById(R.id.representative_list);
         mRepresentativeAdapter = new RepresentativeAdapter(this);
         mRepresentativeList.setAdapter(mRepresentativeAdapter);
+        mRepresentativeList.setClickListener(this);
+        mRepresentativeList.setVisibility(View.GONE);
 
-        mLocationField.postDelayed(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
             public void run() {
-                mLocationField.setVisibility(View.GONE);
+                mRepresentativeList.setAlpha(0f);
                 mRepresentativeList.setVisibility(View.VISIBLE);
+
+                mRepresentativeList.animate()
+                        .alpha(1f)
+                        .setDuration(mShortAnimationDuration)
+                        .setListener(null);
+
+                mLocationField.animate()
+                        .alpha(0f)
+                        .setDuration(mShortAnimationDuration)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                mLocationField.setVisibility(View.GONE);
+                            }
+                        });
             }
-        }, 3000);
+        }, 4500);
+
+        mDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            public void onLongPress(MotionEvent ev) {
+                Log.d(TAG, "POTATO");
+            }
+        });
 
 //        Intent intent = new Intent(this, VoteActivity.class);
 //        intent.putExtra("COUNTY", bundle.getString("COUNTY"));
 //        intent.putExtra("CANDIDATES", bundle.getParcelableArrayList("CANDIDATES"));
 //        intent.putExtra("PERCENTAGES", bundle.getParcelableArrayList("PERCENTAGES"));
 //        startService(intent);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public final void onSensorChanged(SensorEvent event) {
+        double localAccelersum = 0;
+        for (float f : event.values) {
+            localAccelersum += f;
+        }
+
+        if (accelersum == -1) {
+            accelersum = localAccelersum;
+        }
+
+        Log.d(TAG, accelersum + ", " + localAccelersum );
 //        Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
+//        serviceIntent.putExtra("RANDOM", "random");
 //        startService(serviceIntent);
+
+        if (accelersum != localAccelersum && !mLocationText.getText().equals("SHAKE")) {
+            accelersum = localAccelersum;
+            mLocationText.setText("SHAKE");
+            mDistrictText.setText("");
+
+            mLocationField.setAlpha(0f);
+            mLocationField.setVisibility(View.VISIBLE);
+
+            mLocationField.animate()
+                    .alpha(1f)
+                    .setDuration(mShortAnimationDuration)
+                    .setListener(null);
+
+            mRepresentativeList.animate()
+                    .alpha(0f)
+                    .setDuration(mShortAnimationDuration)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            mRepresentativeList.setVisibility(View.GONE);
+                        }
+                    });
+        }
     }
 
     // WearableListView click listener
     @Override
     public void onClick(WearableListView.ViewHolder v) {
         Integer tag = (Integer) v.itemView.getTag();
-        // use this data to complete some action ...
+        Intent intent = new Intent(this, DetailedActivity.class);
+        intent.putExtra("REPRESENTATIVE", mRepresentatives.get(tag));
+        Log.d(TAG, "Starting Detailed View");
+        startActivity(intent);
     }
 
     @Override
     public void onTopEmptyRegionClick() { ; }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) { ; }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        return mDetector.onTouchEvent(ev) || super.onTouchEvent(ev);
+    }
 
     public void loadRepresentatives() {
         // use mLocation to get representatives

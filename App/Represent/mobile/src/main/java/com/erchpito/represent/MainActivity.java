@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -20,8 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private int mLocation;
     private String mDistrict;
     private String mCounty;
-    private ArrayList<String> mCandidates;
-    private ArrayList<Double> mPercentages;
+    private ArrayList<String> mVotes;
     private ArrayList<Representative> mRepresentatives;
 
     private Button mZipButton;
@@ -45,12 +45,9 @@ public class MainActivity extends AppCompatActivity {
         mLocation = 94704;
         mDistrict = "13th Congressional District";
         mCounty = "Alameda County, CA";
-        mCandidates = new ArrayList<String>();
-        mCandidates.add("Obama");
-        mCandidates.add("Romney");
-        mPercentages = new ArrayList<Double>();
-        mPercentages.add(78.9);
-        mPercentages.add(18.2);
+        mVotes = new ArrayList<String>();
+        mVotes.add("Obama: 78.9%");
+        mVotes.add("Romney: 18.2%");
         toCongressionalView();
     }
 
@@ -120,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
         serviceIntent.putExtra("DISTRICT", mDistrict);
         serviceIntent.putExtra("REPRESENTATIVES", mRepresentatives);
         serviceIntent.putExtra("COUNTY", mCounty);
-        serviceIntent.putExtra("CANDIDATES", mCandidates);
-        serviceIntent.putExtra("PERCENTAGES", mPercentages);
+        serviceIntent.putExtra("VOTES", mVotes);
+        Log.d(TAG, "starting service");
         startService(serviceIntent);
     }
 }

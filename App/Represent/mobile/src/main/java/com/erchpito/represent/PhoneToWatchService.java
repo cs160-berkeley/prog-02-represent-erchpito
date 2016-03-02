@@ -4,32 +4,84 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
+import com.erchpito.common.Representative;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
-public class PhoneToWatchService extends Service {
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class PhoneToWatchService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    private static final String TAG = "PhoneToWatchService";
 
     private GoogleApiClient mApiClient;
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Bundle bundle = intent.getExtras();
+        Log.d(TAG, "intent received");
+
+        final DataMap DATAMAP = new DataMap();
+        DATAMAP.putString("LOCATION", bundle.getString("LOCATION"));
+        DATAMAP.putString("DISTRICT", bundle.getString("DISTRICT"));
+        ArrayList<Representative> reps = bundle.getParcelableArrayList("REPRESENTATIVES");
+        ArrayList<DataMap> representatives = new ArrayList<DataMap>();
+        for (Representative rep : reps) {
+            DataMap dataMap = new DataMap();
+            rep.writeToDataMap(dataMap);
+            representatives.add(dataMap);
+        }
+
+        DATAMAP.putDataMapArrayList("REPRESENTATIVES", representatives);
+        DATAMAP.putString("COUNTY", bundle.getString("COUNTY"));
+        DATAMAP.putStringArrayList("VOTES", bundle.getStringArrayList("VOTES"));
+        Log.d(TAG, "DataMap produced");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mApiClient.connect();
+                sendMessage("/wearable_data", "potato");
+
+                PutDataMapRequest putDMR = PutDataMapRequest.create("/wearable_data");
+                putDMR.getDataMap().putAll(DATAMAP);
+                PutDataRequest request = putDMR.asPutDataRequest();
+                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mApiClient, request).await();
+                if (result.getStatus().isSuccess()) {
+                    Log.v("myTag", "DataMap: " + DATAMAP + " sent successfully to data layer ");
+                }
+                else {
+                    Log.v("myTag", "ERROR: failed to send DataMap to data layer");
+                }
+            }
+        }).start();
+
+        return START_STICKY;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) { return null; }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-        mApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                        ;
-                    }
 
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                        ;
-                    }
-                }).build();
+        mApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        Log.d(TAG, "service created");
     }
 
     @Override
@@ -39,25 +91,14 @@ public class PhoneToWatchService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Bundle bundle = intent.getExtras();
-        final String catName = bundle.getString("CAT_NAME");
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mApiClient.connect();
-                sendMessage("/" + catName, catName);
-            }
-        }).start();
-
-        return START_STICKY;
-    }
+    public void onConnected(Bundle connectionHint) { ; }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    public void onConnectionSuspended(int cause) { ; }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) { ; }
+
 
     private void sendMessage( final String path, final String text ) {
         new Thread( new Runnable() {

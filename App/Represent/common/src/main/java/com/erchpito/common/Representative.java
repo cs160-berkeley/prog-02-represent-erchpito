@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.google.android.gms.wearable.DataMap;
+
 import java.util.ArrayList;
 
 /**
@@ -63,7 +65,6 @@ public class Representative implements Parcelable {
     private Representative(Parcel in) {
         this();
         mFirstName = in.readString();
-        Log.d("Rep", mFirstName);
         mLastName = in.readString();
         mMiddleName = in.readString();
         mPortrait = in.readInt();
@@ -76,6 +77,26 @@ public class Representative implements Parcelable {
         mParty = in.readString();
         in.readStringList(mCommittees);
         in.readTypedList(mBills, Bill.CREATOR);
+    }
+
+    public Representative(DataMap in) {
+        this(in.getString("firstName"), in.getString("middleName"), in.getString("lastName"), in.getString("party"));
+        mIsSenator = in.getByte("isSenator") != 0;
+        mPortrait = in.getInt("portrait");
+        mWebsite = "";
+        mEmail = "";
+        mTwitter = "";
+        mStartTerm = "";
+        mEndTerm = "";
+    }
+
+    public void writeToDataMap(DataMap out) {
+        out.putString("firstName", mFirstName);
+        out.putString("lastName", mLastName);
+        out.putString("middleName", mMiddleName);
+        out.putInt("portrait", mPortrait);
+        out.putByte("isSenator", (byte) (mIsSenator ? 1 : 0));
+        out.putString("party", mParty);
     }
 
     @Override
