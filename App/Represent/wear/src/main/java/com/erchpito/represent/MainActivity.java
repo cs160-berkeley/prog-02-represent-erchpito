@@ -44,6 +44,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
     private Typeface font;
     private String mLocation;
     private String mDistrict;
+    private int mColor;
     private double accelersum;
     private ArrayList<Representative> mRepresentatives;
 
@@ -54,6 +55,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 
     private WearableListView mRepresentativeList;
     private RelativeLayout mLocationField;
+    private RelativeLayout mHomeLayout;
     private TextView mLocationText;
     private TextView mDistrictText;
 
@@ -121,7 +123,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         if (bundle != null) {
             mLocation = bundle.getString("LOCATION");
             mDistrict = bundle.getString("DISTRICT");
-            Log.d(TAG, mDistrict);
+            mColor = bundle.getInt("COLOR");
             mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
         } else {
             mLocation = "CA, 94704";
@@ -143,6 +145,9 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 
         mLocationField = (RelativeLayout) findViewById(R.id.field);
         mLocationField.setVisibility(View.VISIBLE);
+
+        mHomeLayout = (RelativeLayout) findViewById(R.id.home);
+        mHomeLayout.setBackgroundColor(mColor);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -187,16 +192,6 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 //        intent.putExtra("CANDIDATES", bundle.getParcelableArrayList("CANDIDATES"));
 //        intent.putExtra("PERCENTAGES", bundle.getParcelableArrayList("PERCENTAGES"));
 //        startService(intent);
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        Bundle bundle = getIntent().getExtras();
-
-        if (bundle != null) {
-            Log.d(TAG, bundle.getString("DISTRICT"));
-        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.WatchViewStub;
 import android.support.wearable.view.WearableListView;
@@ -26,6 +27,7 @@ public class DetailedActivity extends WearableActivity {
     private Representative mRepresentative;
     private Typeface font;
 
+    private RelativeLayout mField;
     private ImageView mPortraitImage;
     private TextView mNameText;
 
@@ -48,5 +50,14 @@ public class DetailedActivity extends WearableActivity {
 
         mPortraitImage.setImageResource(rep.getMyPortrait());
         mNameText.setText(((rep.isSenator()) ? "Sen.\n" : "Rep.\n") + rep.getMyName() + " - " + rep.getMyParty().substring(0, 1));
+
+        mField = (RelativeLayout) findViewById(R.id.field);
+        int color = ContextCompat.getColor(this, R.color.grey);
+        if (rep.getMyParty().equals("Republican")) {
+            color = ContextCompat.getColor(this, R.color.oldGloryRed);
+        } else if (rep.getMyParty().equals("Democratic")) {
+            color = ContextCompat.getColor(this, R.color.oldGloryBlue);
+        }
+        mField.setBackgroundColor(color);
     }
 }

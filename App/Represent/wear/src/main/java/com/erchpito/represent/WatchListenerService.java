@@ -43,6 +43,7 @@ public class WatchListenerService extends WearableListenerService {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.putExtra("LOCATION", dataMap.getString("LOCATION"));
                     intent.putExtra("DISTRICT", dataMap.getString("DISTRICT"));
+                    intent.putExtra("COLOR", dataMap.getInt("COLOR"));
                     ArrayList<DataMap> reps = dataMap.getDataMapArrayList("REPRESENTATIVES");
                     ArrayList<Representative> representatives = new ArrayList<Representative>();
                     for (DataMap rep : reps) {
@@ -51,7 +52,6 @@ public class WatchListenerService extends WearableListenerService {
                     intent.putExtra("REPRESENTATIVES", representatives);
                     intent.putExtra("COUNTY", dataMap.getString("COUNTY"));
                     intent.putExtra("VOTES", dataMap.getStringArrayList("VOTES"));
-                    Log.d(TAG, dataMap.getString("DISTRICT"));
                     startActivity(intent);
                 }
             }

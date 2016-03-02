@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         String location = RepresentCalculator.findLocation(zipcode);
         String district = RepresentCalculator.findCongressionalDistrict(zipcode);
         String county = RepresentCalculator.findCounty(zipcode);
+        int color = RepresentCalculator.findColor(zipcode, this);
         ArrayList<String> votes = RepresentCalculator.find2012Vote(zipcode);
         ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
 
@@ -57,12 +58,14 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("LOCATION", location);
         intent.putExtra("DISTRICT", district);
         intent.putExtra("REPRESENTATIVES", representatives);
+        intent.putExtra("COLOR", color);
         startActivity(intent);
 
         Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
         serviceIntent.putExtra("LOCATION", location);
         serviceIntent.putExtra("DISTRICT", district);
         serviceIntent.putExtra("REPRESENTATIVES", representatives);
+        serviceIntent.putExtra("COLOR", color);
         serviceIntent.putExtra("COUNTY", county);
         serviceIntent.putExtra("VOTES", votes);
         Log.d(TAG, "starting service");

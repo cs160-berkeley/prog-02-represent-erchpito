@@ -1,7 +1,9 @@
 package com.erchpito.common;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;

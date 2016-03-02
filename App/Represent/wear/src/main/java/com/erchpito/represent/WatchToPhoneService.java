@@ -27,32 +27,6 @@ public class WatchToPhoneService extends Service implements GoogleApiClient.Conn
 
     private GoogleApiClient mApiClient;
 
-//    private List<Node> nodes = new ArrayList<>();
-//
-//    @Override //alternate method to connecting: no longer create this in a new thread, but as a callback
-//    public void onConnected(Bundle bundle) {
-//        Log.d(TAG, "in onconnected");
-//        Wearable.NodeApi.getConnectedNodes(mApiClient)
-//                .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-//                    @Override
-//                    public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
-//                        nodes = getConnectedNodesResult.getNodes();
-//                        Log.d(TAG, "found nodes");
-//                        //when we find a connected node, we populate the list declared above
-//                        //finally, we can send a message
-//                        sendMessage("/handheld_data_random", "random");
-//                        Log.d(TAG, "sent");
-//                    }
-//                });
-//    }
-//
-//    private void sendMessage(final String path, final String text ) {
-//        for (Node node : nodes) {
-//            Wearable.MessageApi.sendMessage(
-//                    mApiClient, node.getId(), path, text.getBytes());
-//        }
-//    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Bundle bundle = intent.getExtras();

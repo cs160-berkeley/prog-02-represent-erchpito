@@ -1,5 +1,8 @@
 package com.erchpito.represent;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
+
 import com.erchpito.common.Representative;
 
 import java.lang.reflect.Array;
@@ -33,6 +36,10 @@ public class RepresentCalculator {
     public static String findCongressionalDistrict(int zipcode) {
         /* ---- HARDCODE ---- */
         return (zipcode == 94704) ? "13th Congressional District" : "10th Congressional District";
+    }
+
+    public static int findColor(int zipcode, Context context) {
+        return ContextCompat.getColor(context, (zipcode == 94704) ? R.color.oldGloryBlue : R.color.oldGloryRed);
     }
 
     public static ArrayList<String> find2012Vote(int zipcode) {

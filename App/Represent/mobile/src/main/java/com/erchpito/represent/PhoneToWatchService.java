@@ -35,6 +35,7 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
         final DataMap DATAMAP = new DataMap();
         DATAMAP.putString("LOCATION", bundle.getString("LOCATION"));
         DATAMAP.putString("DISTRICT", bundle.getString("DISTRICT"));
+        DATAMAP.putInt("COLOR", bundle.getInt("COLOR"));
         ArrayList<Representative> reps = bundle.getParcelableArrayList("REPRESENTATIVES");
         ArrayList<DataMap> representatives = new ArrayList<DataMap>();
         for (Representative rep : reps) {
@@ -46,7 +47,7 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
         DATAMAP.putDataMapArrayList("REPRESENTATIVES", representatives);
         DATAMAP.putString("COUNTY", bundle.getString("COUNTY"));
         DATAMAP.putStringArrayList("VOTES", bundle.getStringArrayList("VOTES"));
-        DATAMAP.putLong("Time", System.currentTimeMillis());
+        DATAMAP.putLong("TIME", System.currentTimeMillis());
         Log.d(TAG, "DataMap produced");
 
         new Thread(new Runnable() {

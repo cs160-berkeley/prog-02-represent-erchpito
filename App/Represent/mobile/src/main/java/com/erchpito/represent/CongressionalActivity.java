@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.erchpito.common.Representative;
@@ -26,8 +28,11 @@ public class CongressionalActivity extends AppCompatActivity {
     private Typeface font;
     private String mLocation;
     private String mDistrict;
+    private int mColor;
     private ArrayList<Representative> mRepresentatives;
     private RepresentativeArrayAdapter mRepresentativeAdapter;
+
+    private RelativeLayout mHomeLayout;
 
     private ListView mRepresentativeList;
     private TextView mLocationText;
@@ -48,6 +53,8 @@ public class CongressionalActivity extends AppCompatActivity {
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.representative_list_view, parent, false);
             }
+
+            RelativeLayout home = (RelativeLayout) convertView.findViewById(R.id.list_view_home);
 
             TextView name = (TextView) convertView.findViewById(R.id.list_view_name);
             name.setTypeface(font);
@@ -84,6 +91,14 @@ public class CongressionalActivity extends AppCompatActivity {
                 }
             });
 
+            int color = ContextCompat.getColor(mContext,  R.color.grey);
+            if (rep.getMyParty().equals("Republican")) {
+                color = ContextCompat.getColor(mContext,  R.color.oldGloryRed);
+            } else if (rep.getMyParty().equals("Democratic")) {
+                color = ContextCompat.getColor(mContext,  R.color.oldGloryBlue);
+            }
+            home.setBackgroundColor(color);
+
             return convertView;
         }
     }
@@ -99,6 +114,7 @@ public class CongressionalActivity extends AppCompatActivity {
         mLocation = bundle.getString("LOCATION");
         mDistrict = bundle.getString("DISTRICT");
         mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
+        mColor = bundle.getInt("COLOR");
 
         mLocationText = (TextView) findViewById(R.id.location_text);
         mLocationText.setText(mLocation);
@@ -111,6 +127,9 @@ public class CongressionalActivity extends AppCompatActivity {
         mRepresentativeList = (ListView) findViewById(R.id.representative_list);
         mRepresentativeAdapter = new RepresentativeArrayAdapter(this);
         mRepresentativeList.setAdapter(mRepresentativeAdapter);
+
+        mHomeLayout = (RelativeLayout) findViewById(R.id.home);
+        mHomeLayout.setBackgroundColor(mColor);
     }
 
 }

@@ -2,9 +2,11 @@ package com.erchpito.represent;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.erchpito.common.Representative;
@@ -15,6 +17,8 @@ public class DetailedActivity extends AppCompatActivity {
 
     private Representative mRepresentative;
     private Typeface font;
+
+    private RelativeLayout mHomeLayout;
 
     private ImageView mPortraitImage;
     private TextView mNameText;
@@ -73,6 +77,15 @@ public class DetailedActivity extends AppCompatActivity {
             render += "\t" + rep.getMyBills(i) + "\n\n";
         }
         mCareerText.setText(render);
+
+        mHomeLayout = (RelativeLayout) findViewById(R.id.home);
+        int color = ContextCompat.getColor(this, R.color.grey);
+        if (rep.getMyParty().equals("Republican")) {
+            color = ContextCompat.getColor(this, R.color.oldGloryRed);
+        } else if (rep.getMyParty().equals("Democratic")) {
+            color = ContextCompat.getColor(this, R.color.oldGloryBlue);
+        }
+        mHomeLayout.setBackgroundColor(color);
     }
 
 }
