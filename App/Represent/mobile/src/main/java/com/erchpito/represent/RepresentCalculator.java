@@ -2,16 +2,19 @@ package com.erchpito.represent;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.erchpito.common.Representative;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by erchpito on 2/3/2016.
  */
-public class RepresentCalculator {
+public final class RepresentCalculator {
+
+    private static HashMap<Integer, ArrayList<Representative>> repHash = new HashMap<Integer, ArrayList<Representative>>();
 
     public static int findZipCode(int lat, int lon) {
         /* ---- HARDCODE ---- */
@@ -58,6 +61,11 @@ public class RepresentCalculator {
     }
 
     public static ArrayList<Representative> findRepresentatives(int zipcode) {
+        if (repHash.containsKey(zipcode)) {
+            Log.d("T", "hashing");
+            return repHash.get(zipcode);
+        }
+
         ArrayList<Representative> representatives = new ArrayList<Representative>();
 
         /* ---- HARDCODE ---- */
@@ -143,6 +151,7 @@ public class RepresentCalculator {
             representatives.add(RepBarbaraLee);
         }
 
+        repHash.put(zipcode, representatives);
         return representatives;
     }
 

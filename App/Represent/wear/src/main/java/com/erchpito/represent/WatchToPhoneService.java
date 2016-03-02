@@ -33,7 +33,12 @@ public class WatchToPhoneService extends Service implements GoogleApiClient.Conn
         Log.d(TAG, "intent received");
 
         final DataMap DATAMAP = new DataMap();
-        DATAMAP.putLong("Time", System.currentTimeMillis());
+        DATAMAP.putLong("TIME", System.currentTimeMillis());
+        if (intent.hasExtra("INDEX")) {
+            DATAMAP.putInt("INDEX", bundle.getInt("INDEX"));
+            DATAMAP.putInt("ZIP", bundle.getInt("ZIP"));
+        }
+        final String PATH = bundle.getString("ACTION");
         Log.d(TAG, "DataMap produced");
 
         new Thread(new Runnable() {
@@ -41,7 +46,7 @@ public class WatchToPhoneService extends Service implements GoogleApiClient.Conn
             public void run() {
                 mApiClient.connect();
 
-                PutDataMapRequest putDMR = PutDataMapRequest.create("/handheld_data_random");
+                PutDataMapRequest putDMR = PutDataMapRequest.create("/handheld_data_" + PATH);
                 putDMR.getDataMap().putAll(DATAMAP);
                 PutDataRequest request = putDMR.asPutDataRequest();
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mApiClient, request).await();

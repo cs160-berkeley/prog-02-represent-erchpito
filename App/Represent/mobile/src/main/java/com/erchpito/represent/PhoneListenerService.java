@@ -62,11 +62,14 @@ public class PhoneListenerService extends WearableListenerService {
 
                 } else if (path.equals("/handheld_data_detailed")) {
 
-//                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-//                    Log.d(TAG, "DataMap received on watch: " + dataMap);
-//                    Intent intent = new Intent(this, DetailedActivity.class);
-//                    intent.putExtra("REPRESENTATIVE", rep);
-//                    startActivity(intent);
+                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    Log.d(TAG, "DataMap received on phone: " + dataMap);
+
+                    Intent intent = new Intent(this, DetailedActivity.class);
+                    Representative rep = RepresentCalculator.findRepresentatives(dataMap.getInt("ZIP")).get(dataMap.getInt("INDEX"));
+                    intent.putExtra("REPRESENTATIVE", rep);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
             }
         }

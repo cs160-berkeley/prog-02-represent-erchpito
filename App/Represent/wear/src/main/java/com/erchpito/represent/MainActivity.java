@@ -11,9 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.MotionEventCompat;
 import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -21,20 +19,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.erchpito.common.Representative;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 public class MainActivity extends WearableActivity implements WearableListView.ClickListener, SensorEventListener {
 
@@ -223,6 +213,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
             mDistrictText.setText("");
 
             Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
+            serviceIntent.putExtra("ACTION", "random");
             startService(serviceIntent);
 
             mLocationField.setAlpha(0f);
@@ -253,6 +244,12 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         intent.putExtra("REPRESENTATIVE", mRepresentatives.get(tag));
         Log.d(TAG, "Starting Detailed View");
         startActivity(intent);
+
+        Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
+        serviceIntent.putExtra("ACTION", "detailed");
+        serviceIntent.putExtra("INDEX", tag);
+        serviceIntent.putExtra("ZIP", Integer.parseInt(mLocation.substring(mLocation.length() - 5)));
+        startService(serviceIntent);
     }
 
     @Override
