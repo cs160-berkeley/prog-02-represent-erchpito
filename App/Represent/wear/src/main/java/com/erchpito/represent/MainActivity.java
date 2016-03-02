@@ -118,18 +118,16 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 
         Bundle bundle = getIntent().getExtras();
 
-//         if there's a chance it can be null
-//        if (bundle != null) {
-//            bundle.getString();
-//        }
+        if (bundle != null) {
+            mLocation = bundle.getString("LOCATION");
+            mDistrict = bundle.getString("DISTRICT");
+            mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
+        } else {
+            mLocation = "CA, 94704";
+            mDistrict = "13th Congressional District";
+            loadRepresentatives();
+        }
 
-        mLocation = bundle.getString("LOCATION");
-        mDistrict = bundle.getString("DISTRICT");
-        mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
-
-//        mLocation = "CA, 94704";
-//        mDistrict = "13th Congressional District";
-//        loadRepresentatives();
         mShortAnimationDuration = getResources().getInteger(android.R.integer.config_longAnimTime);
 
         accelersum = -1.0;
@@ -212,8 +210,6 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         if (accelersum == -1) {
             accelersum = localAccelersum;
         }
-
-        Log.d(TAG, accelersum + ", " + localAccelersum );
 //        Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
 //        serviceIntent.putExtra("RANDOM", "random");
 //        startService(serviceIntent);

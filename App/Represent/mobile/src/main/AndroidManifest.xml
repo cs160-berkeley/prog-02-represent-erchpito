@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.erchpito.represent">
 
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--<uses-permission android:name="android.permission.WAKE_LOCK" />-->
 
     <application
         android:allowBackup="true"
@@ -31,17 +31,12 @@
 
         <service
             android:name=".PhoneListenerService"
-            android:enabled="false"
-            android:exported="false"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
-        <service
-            android:name=".PhoneToWatchService"
-            android:enabled="false"
-            android:exported="false"/>
+        <service android:name=".PhoneToWatchService" />
     </application>
 
 </manifest>

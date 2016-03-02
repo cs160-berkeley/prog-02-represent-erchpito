@@ -46,23 +46,24 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
         DATAMAP.putDataMapArrayList("REPRESENTATIVES", representatives);
         DATAMAP.putString("COUNTY", bundle.getString("COUNTY"));
         DATAMAP.putStringArrayList("VOTES", bundle.getStringArrayList("VOTES"));
+        DATAMAP.putLong("Time", System.currentTimeMillis());
         Log.d(TAG, "DataMap produced");
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 mApiClient.connect();
-                sendMessage("/wearable_data", "potato");
+//                sendMessage("/wearable_data", "potato");
 
                 PutDataMapRequest putDMR = PutDataMapRequest.create("/wearable_data");
                 putDMR.getDataMap().putAll(DATAMAP);
                 PutDataRequest request = putDMR.asPutDataRequest();
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mApiClient, request).await();
                 if (result.getStatus().isSuccess()) {
-                    Log.v("myTag", "DataMap: " + DATAMAP + " sent successfully to data layer ");
+                    Log.d(TAG, "DataMap: " + DATAMAP + " sent successfully to data layer ");
                 }
                 else {
-                    Log.v("myTag", "ERROR: failed to send DataMap to data layer");
+                    Log.d(TAG, "ERROR: failed to send DataMap to data layer");
                 }
             }
         }).start();
@@ -100,16 +101,16 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
     public void onConnectionFailed(ConnectionResult connectionResult) { ; }
 
 
-    private void sendMessage( final String path, final String text ) {
-        new Thread( new Runnable() {
-            @Override
-            public void run() {
-                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mApiClient).await();
-                for(Node node : nodes.getNodes()) {
-                    MessageApi.SendMessageResult result = Wearable.MessageApi
-                            .sendMessage(mApiClient, node.getId(), path, text.getBytes()).await();
-                }
-            }
-        }).start();
-    }
+//    private void sendMessage( final String path, final String text ) {
+//        new Thread( new Runnable() {
+//            @Override
+//            public void run() {
+//                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mApiClient).await();
+//                for(Node node : nodes.getNodes()) {
+//                    MessageApi.SendMessageResult result = Wearable.MessageApi
+//                            .sendMessage(mApiClient, node.getId(), path, text.getBytes()).await();
+//                }
+//            }
+//        }).start();
+//    }
 }
