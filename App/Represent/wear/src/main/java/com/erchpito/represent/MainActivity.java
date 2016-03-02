@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.wearable.activity.WearableActivity;
+import android.support.wearable.view.DismissOverlayView;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -24,22 +25,25 @@ import android.widget.TextView;
 
 import com.erchpito.common.Representative;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class MainActivity extends WearableActivity implements WearableListView.ClickListener, SensorEventListener {
 
     private static final String TAG = "WearMainActivity";
 
-    private int mShortAnimationDuration;
+    private int mAnimationDuration;
     private Typeface font;
     private String mLocation;
     private String mDistrict;
+    private String mCounty;
     private int mColor;
     private double accelersum;
     private ArrayList<Representative> mRepresentatives;
+    private ArrayList<String> mVotes;
 
     private RepresentativeAdapter mRepresentativeAdapter;
-    private GestureDetector mDetector;
     private SensorManager mSensorManager;
     private Sensor mSensor;
 
@@ -48,6 +52,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
     private RelativeLayout mHomeLayout;
     private TextView mLocationText;
     private TextView mDistrictText;
+    private TextView mVoteText;
 
     private class RepresentativeAdapter extends WearableListView.Adapter {
 
@@ -115,13 +120,16 @@ public class MainActivity extends WearableActivity implements WearableListView.C
             mDistrict = bundle.getString("DISTRICT");
             mColor = bundle.getInt("COLOR");
             mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
+            mCounty = bundle.getString("COUNTY");
+            mVotes = bundle.getStringArrayList("VOTES");
         } else {
-            mLocation = "CA, 94704";
-            mDistrict = "13th Congressional District";
-            loadRepresentatives();
+            finish();
+            Log.d(TAG, "finishing Activity");
+            mVotes = new ArrayList<String>();
+            mRepresentatives = new ArrayList<Representative>();
         }
 
-        mShortAnimationDuration = getResources().getInteger(android.R.integer.config_longAnimTime);
+        mAnimationDuration = getResources().getInteger(android.R.integer.config_longAnimTime);
 
         accelersum = -1.0;
 
@@ -132,6 +140,15 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         mDistrictText = (TextView) findViewById(R.id.district_text);
         mDistrictText.setText(mDistrict);
         mDistrictText.setTypeface(font);
+
+        mVoteText = (TextView) findViewById(R.id.vote_text);
+        String render = "2012 Presidential Vote\n" + mCounty + "\n\n";
+        for (String candidate : mVotes) {
+            render += candidate + "\n\n";
+        }
+        mVoteText.setText(render);
+        mVoteText.setTypeface(font);
+        mVoteText.setVisibility(View.GONE);
 
         mLocationField = (RelativeLayout) findViewById(R.id.field);
         mLocationField.setVisibility(View.VISIBLE);
@@ -156,12 +173,12 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 
                 mRepresentativeList.animate()
                         .alpha(1f)
-                        .setDuration(mShortAnimationDuration)
+                        .setDuration(mAnimationDuration)
                         .setListener(null);
 
                 mLocationField.animate()
                         .alpha(0f)
-                        .setDuration(mShortAnimationDuration)
+                        .setDuration(mAnimationDuration)
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
@@ -170,18 +187,6 @@ public class MainActivity extends WearableActivity implements WearableListView.C
                         });
             }
         }, 4500);
-
-        mDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            public void onLongPress(MotionEvent ev) {
-                Log.d(TAG, "POTATO");
-            }
-        });
-
-//        Intent intent = new Intent(this, VoteActivity.class);
-//        intent.putExtra("COUNTY", bundle.getString("COUNTY"));
-//        intent.putExtra("CANDIDATES", bundle.getParcelableArrayList("CANDIDATES"));
-//        intent.putExtra("PERCENTAGES", bundle.getParcelableArrayList("PERCENTAGES"));
-//        startService(intent);
     }
 
     @Override
@@ -221,12 +226,12 @@ public class MainActivity extends WearableActivity implements WearableListView.C
 
             mLocationField.animate()
                     .alpha(1f)
-                    .setDuration(mShortAnimationDuration)
+                    .setDuration(mAnimationDuration)
                     .setListener(null);
 
             mRepresentativeList.animate()
                     .alpha(0f)
-                    .setDuration(mShortAnimationDuration)
+                    .setDuration(mAnimationDuration)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
@@ -242,71 +247,67 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         Integer tag = (Integer) v.itemView.getTag();
         Intent intent = new Intent(this, DetailedActivity.class);
         intent.putExtra("REPRESENTATIVE", mRepresentatives.get(tag));
+        intent.putExtra("ACTION", "detailed");
+        intent.putExtra("INDEX", tag);
+        intent.putExtra("ZIP", Integer.parseInt(mLocation.substring(mLocation.length() - 5)));
         Log.d(TAG, "Starting Detailed View");
         startActivity(intent);
-
-        Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
-        serviceIntent.putExtra("ACTION", "detailed");
-        serviceIntent.putExtra("INDEX", tag);
-        serviceIntent.putExtra("ZIP", Integer.parseInt(mLocation.substring(mLocation.length() - 5)));
-        startService(serviceIntent);
     }
 
     @Override
-    public void onTopEmptyRegionClick() { ; }
+    public void onTopEmptyRegionClick() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mVoteText.setAlpha(0f);
+                mVoteText.setVisibility(View.VISIBLE);
+
+                mVoteText.animate()
+                        .alpha(1f)
+                        .setDuration(mAnimationDuration)
+                        .setListener(null);
+
+                mRepresentativeList.animate()
+                        .alpha(0f)
+                        .setDuration(mAnimationDuration)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                mRepresentativeList.setVisibility(View.GONE);
+                            }
+                        });
+            }
+        }, 0);
+    }
+
+    public void disappear(View view) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mRepresentativeList.setAlpha(0f);
+                mRepresentativeList.setVisibility(View.VISIBLE);
+
+                mRepresentativeList.animate()
+                        .alpha(1f)
+                        .setDuration(mAnimationDuration)
+                        .setListener(null);
+
+                mVoteText.animate()
+                        .alpha(0f)
+                        .setDuration(mAnimationDuration)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                mVoteText.setVisibility(View.GONE);
+                            }
+                        });
+            }
+        }, 0);
+
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) { ; }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        return mDetector.onTouchEvent(ev) || super.onTouchEvent(ev);
-    }
-
-    public void loadRepresentatives() {
-        // use mLocation to get representatives
-        mRepresentatives = new ArrayList<Representative>();
-        /* ---- HARDCODE ---- */
-        // Barbara Boxer
-        Representative SenBarbaraBoxer = new Representative("Barbara", "Levy", "Boxer", "Democratic");
-        SenBarbaraBoxer.setMyHouse(true);
-        SenBarbaraBoxer.setMyPortrait(R.drawable.boxer);
-        SenBarbaraBoxer.setMyTerm("Jan. 3, 2010", "Jan. 3, 2016");
-        SenBarbaraBoxer.setMySocial("boxer.senate.gov", "senbarbaraboxer@gmail.com", "@SenatorBoxer");
-        SenBarbaraBoxer.addCommittee("Committee on Commerce, Science, and Transportation");
-        SenBarbaraBoxer.addCommittee("Committee on Environment and Public Works");
-        SenBarbaraBoxer.addCommittee("Committee on Foreign Relations");
-        SenBarbaraBoxer.addCommittee("Select Committee on Ethics");
-        SenBarbaraBoxer.addBill("Feb. 3, 2016", 2487, "Female Veteran Suicide Prevention Act");
-        mRepresentatives.add(SenBarbaraBoxer);
-
-        // Dianne Feinstein
-        Representative SenDianneFeinstein = new Representative("Dianne", "Goldman", "Feinstein", "Democratic");
-        SenDianneFeinstein.setMyHouse(true);
-        SenDianneFeinstein.setMyPortrait(R.drawable.feinstein);
-        SenDianneFeinstein.setMyTerm("Jan. 3, 2012", "Jan. 3, 2018");
-        SenDianneFeinstein.setMySocial("feintsein.senate.gov", "sendiannefeinstein@gmail.com", "@SenFeinstein");
-        SenDianneFeinstein.addCommittee("Committee on Appropriations");
-        SenDianneFeinstein.addCommittee("Committee on the Judicary");
-        SenDianneFeinstein.addCommittee("Committee on Rules and Administration");
-        SenDianneFeinstein.addCommittee("Select Committee on Intelligence");
-        SenDianneFeinstein.addBill("Feb. 23, 2016", 2568, "California Desert Conservation, Off-Road Recreation, and Renewable Energy Act");
-        SenDianneFeinstein.addBill("Feb. 11, 2016", 2552, "Interstate Threats Clarification Act of 2016");
-        SenDianneFeinstein.addBill("Feb. 10, 2016", 2533, "California Long-Term Provisions for Water Supply and Short-Term Provisions for Emergency Drought Relief Act");
-        SenDianneFeinstein.addBill("Jan. 12, 2016", 2442, "A bill to authorize the use of passenger facility charges at an airport previously associated with the airport at which the charges are collected");
-        SenDianneFeinstein.addBill("Jan. 20, 2016", 2422, "Fiscal Year 2016 Department of Veterans Affairs Seismic Safety and Construction Authorization Act");
-        mRepresentatives.add(SenDianneFeinstein);
-
-        // Barbara Lee
-        Representative RepBarbaraLee = new Representative("Barbara", "Jean", "Lee", "Democratic");
-        RepBarbaraLee.setMyHouse(false);
-        RepBarbaraLee.setMyPortrait(R.drawable.lee);
-        RepBarbaraLee.setMyTerm("Jan. 3, 2015", "Jan. 3, 2017");
-        RepBarbaraLee.setMySocial("lee.house.gov", "repbarbaralee@gmail.com", "@RepBarbaraLee");
-        RepBarbaraLee.addCommittee("Committee on Appropriations");
-        RepBarbaraLee.addCommittee("House Committee on The Budget");
-        mRepresentatives.add(RepBarbaraLee);
-    }
 }
 
 

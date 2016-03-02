@@ -53,7 +53,7 @@ public final class RepresentCalculator {
             vote.add("Obama: 78.9%");
             vote.add("Romney: 18.2%");
         } else {
-            vote.add("Romeny: 74.3%");
+            vote.add("Romney: 74.3%");
             vote.add("Obama: 25.0%");
         }
 

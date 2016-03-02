@@ -18,7 +18,7 @@
         android:layout_centerVertical="true"
         android:padding="5dp"
 
-        android:visibility="visible">
+        android:visibility="invisible">
 
         <TextView android:id="@+id/location_text"
             android:layout_width="match_parent"
@@ -51,6 +51,19 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
 
-        android:visibility="visible"/>
+        android:visibility="invisible"/>
+
+    <TextView android:id="@+id/vote_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+
+        android:textSize="12sp"
+        android:visibility="visible"
+        android:onClick="disappear"
+        android:text="2012 Presidential Vote\nAlameda County, CA\n\nObama: 78.9%\n\nRomney: 18.2%"/>
 
 </RelativeLayout>

@@ -2,6 +2,7 @@ package com.erchpito.represent;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -59,5 +60,11 @@ public class DetailedActivity extends WearableActivity {
             color = ContextCompat.getColor(this, R.color.oldGloryBlue);
         }
         mField.setBackgroundColor(color);
+
+        Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
+        serviceIntent.putExtra("ACTION", bundle.getString("ACTION"));
+        serviceIntent.putExtra("INDEX", bundle.getInt("INDEX"));
+        serviceIntent.putExtra("ZIP", bundle.getInt("ZIP"));
+        startService(serviceIntent);
     }
 }
