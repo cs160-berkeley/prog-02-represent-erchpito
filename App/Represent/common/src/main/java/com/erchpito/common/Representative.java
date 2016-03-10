@@ -18,7 +18,6 @@ public class Representative implements Parcelable {
     // Name
     private String mFirstName;
     private String mLastName;
-    private String mMiddleName;
 
     // Picture
     private int mPortrait;
@@ -27,6 +26,7 @@ public class Representative implements Parcelable {
     private String mWebsite;
     private String mEmail;
     private String mTwitter;
+    private String mLastTweet;
 
     // Career
     private boolean mIsSenator;
@@ -56,10 +56,9 @@ public class Representative implements Parcelable {
         mBills = new ArrayList<Bill>();
     }
 
-    public Representative(String firstName, String middleName, String lastName, String party) {
+    public Representative(String firstName, String lastName, String party) {
         this();
         mFirstName = firstName;
-        mMiddleName = middleName;
         mLastName = lastName;
         mParty = party;
     }
@@ -68,11 +67,11 @@ public class Representative implements Parcelable {
         this();
         mFirstName = in.readString();
         mLastName = in.readString();
-        mMiddleName = in.readString();
         mPortrait = in.readInt();
         mWebsite = in.readString();
         mEmail = in.readString();
         mTwitter = in.readString();
+        mLastTweet = in.readString();
         mIsSenator = in.readByte() != 0;
         mStartTerm = in.readString();
         mEndTerm = in.readString();
@@ -82,7 +81,7 @@ public class Representative implements Parcelable {
     }
 
     public Representative(DataMap in) {
-        this(in.getString("firstName"), in.getString("middleName"), in.getString("lastName"), in.getString("party"));
+        this(in.getString("firstName"), in.getString("lastName"), in.getString("party"));
         mIsSenator = in.getByte("isSenator") != 0;
         mPortrait = in.getInt("portrait");
         mWebsite = "";
@@ -95,7 +94,6 @@ public class Representative implements Parcelable {
     public void writeToDataMap(DataMap out) {
         out.putString("firstName", mFirstName);
         out.putString("lastName", mLastName);
-        out.putString("middleName", mMiddleName);
         out.putInt("portrait", mPortrait);
         out.putByte("isSenator", (byte) (mIsSenator ? 1 : 0));
         out.putString("party", mParty);
@@ -105,11 +103,11 @@ public class Representative implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(mFirstName);
         out.writeString(mLastName);
-        out.writeString(mMiddleName);
         out.writeInt(mPortrait);
         out.writeString(mWebsite);
         out.writeString(mEmail);
         out.writeString(mTwitter);
+        out.writeString(mLastTweet);
         out.writeByte((byte) (mIsSenator ? 1 : 0));
         out.writeString(mStartTerm);
         out.writeString(mEndTerm);
@@ -133,16 +131,9 @@ public class Representative implements Parcelable {
 
     public String getMyEmail() { return mEmail; }
 
-    public String getMyLastTweet() {
-        // mTwitter
-        String lastTweet = "This is the last tweet";
-        return lastTweet;
-    }
+    public String getMyLastTweet() { return mLastTweet; }
 
-    public String getMyName() {
-        // assumes a middle name
-        return mFirstName + " " + mMiddleName.substring(0, 1) + ". " + mLastName;
-    }
+    public String getMyName() { return mFirstName + " " + mLastName; }
 
     public String getMyParty() { return mParty; }
 
@@ -161,6 +152,8 @@ public class Representative implements Parcelable {
     public void setMyHouse(boolean isSenator) {
         mIsSenator = isSenator;
     }
+
+    public void setMyLastTweet(String tweet) { mLastTweet = tweet; }
 
     public void setMyPortrait(int img) { mPortrait = img; }
 
