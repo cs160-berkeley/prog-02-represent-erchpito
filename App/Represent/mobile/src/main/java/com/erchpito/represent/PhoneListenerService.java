@@ -39,7 +39,7 @@ public class PhoneListenerService extends WearableListenerService {
                     String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
                     int color = RepresentCalculator.findColor(zipcode, this);
                     ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
-                    ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
+                    ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode, this);
 
                     Intent intent = new Intent(this, CongressionalActivity.class);
                     intent.putExtra("LOCATION", location[0]);
@@ -63,7 +63,7 @@ public class PhoneListenerService extends WearableListenerService {
                     Log.d(TAG, "DataMap received on phone: " + dataMap);
 
                     Intent intent = new Intent(this, DetailedActivity.class);
-                    Representative rep = RepresentCalculator.findRepresentatives(dataMap.getString("ZIP")).get(dataMap.getInt("INDEX"));
+                    Representative rep = RepresentCalculator.findRepresentatives(dataMap.getString("ZIP"), this).get(dataMap.getInt("INDEX"));
                     intent.putExtra("REPRESENTATIVE", rep);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);

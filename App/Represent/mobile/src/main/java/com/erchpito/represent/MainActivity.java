@@ -23,7 +23,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         try {
             String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
             ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
-            ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
+            ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode, this);
             int color = RepresentCalculator.findColor(zipcode, this);
 
             Intent intent = new Intent(this, CongressionalActivity.class);

@@ -140,9 +140,14 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         mDistrictText.setTypeface(font);
 
         mVoteText = (TextView) findViewById(R.id.vote_text);
-        String render = "2012 Presidential Vote\n" + mVotes.get(0) + "\n\n";
-        for (int i = 1; i < mVotes.size(); i++) {
-            render += mVotes.get(i) + "\n\n";
+        String render = "";
+        if (mVotes.size() == 0) {
+            render = "Voting data\nnot available";
+        } else {
+            render = "2012 Presidential Vote\n" + mVotes.get(0) + "\n\n";
+            for (int i = 1; i < mVotes.size(); i++) {
+                render += mVotes.get(i) + "\n\n";
+            }
         }
         mVoteText.setText(render);
         mVoteText.setTypeface(font);

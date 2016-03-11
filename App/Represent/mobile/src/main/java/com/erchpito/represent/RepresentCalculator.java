@@ -1,11 +1,20 @@
 package com.erchpito.represent;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.erchpito.common.Representative;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.AppSession;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.services.StatusesService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,6 +22,9 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by erchpito on 2/3/2016.
@@ -20,6 +32,10 @@ import java.util.HashMap;
 public final class RepresentCalculator {
 
     private static final String TAG = "RepresentCalculator";
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "yj6GsqrlTzwAVqEEahPSYFtZs";
+    private static final String TWITTER_SECRET = "KJkdLmgO3zc6w8A0kRCcpZV4YIXTY9Xe2BKS6h2zuEEMLv12aW";
 
     private static HashMap<String, ArrayList<Representative>> repHash = new HashMap<String, ArrayList<Representative>>();
     private static HashMap<String, String> districtHash = new HashMap<String, String>();
@@ -76,9 +92,12 @@ public final class RepresentCalculator {
         return findZipCode(0.0, 0.0);
     }
 
-    public static ArrayList<Representative> findRepresentatives(String zipcode) {
+    public static ArrayList<Representative> findRepresentatives(String zipcode, Context context) {
         if (!repHash.containsKey(zipcode)) {
             try {
+                TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+                Fabric.with(context, new Twitter(authConfig));
+
                 ArrayList<Representative> output = new ArrayList<Representative>();
                 JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/legislators/locate?" + "zip=" + zipcode).get().getJSONArray("results");
                 for (int i = 0; i < result.length(); i++) {
@@ -87,6 +106,7 @@ public final class RepresentCalculator {
                     rep.setMyHouse(legislator.getString("chamber").equals("senate"));
                     rep.setMyTerm(legislator.getString("term_start"), legislator.getString("term_end"));
                     rep.setMySocial(legislator.getString("website"), legislator.getString("oc_email"), legislator.getString("twitter_id")); // twitter_id sans @
+                    final String handle = legislator.getString("twitter_id");
 
                     JSONArray subResult = new APICallTask().execute("https://congress.api.sunlightfoundation.com/committees?" + "member_ids=" + legislator.getString("bioguide_id")).get().getJSONArray("results");
                     Log.d(TAG, subResult.toString());
@@ -107,6 +127,33 @@ public final class RepresentCalculator {
 
                     rep.setMyPortrait(R.drawable.boxer);
                     rep.setMyLastTweet("meow");
+
+                    TwitterCore.getInstance().logInGuest(new Callback<AppSession>() {
+                        @Override
+                        public void success(Result<AppSession> appSessionResult) {
+                            AppSession session = appSessionResult.data;
+                            TwitterApiClient twitterApiClient = TwitterCore.getInstance().getApiClient(session);
+                            twitterApiClient.getStatusesService().userTimeline(null, handle, 1, null, null, false, false, false, true, new Callback<List<Tweet>>() {
+                                @Override
+                                public void success(Result<List<Tweet>> listResult) {
+                                    for (Tweet tweet : listResult.data) {
+//                                        rep.setMyLastTweet(tweet.text);
+                                        Log.d("fabricstuff", "result: " + tweet.text + "  " + tweet.createdAt);
+                                    }
+                                }
+
+                                @Override
+                                public void failure(TwitterException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void failure(TwitterException e) {
+                            e.printStackTrace();
+                        }
+                    });
 
                     output.add(rep);
                 }
