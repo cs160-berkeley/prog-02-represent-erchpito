@@ -79,11 +79,15 @@ public class DetailedActivity extends AppCompatActivity {
         mCareerText.setText(render);
 
         mHomeLayout = (RelativeLayout) findViewById(R.id.home);
-        int color = ContextCompat.getColor(this, R.color.grey);
+        int color = ContextCompat.getColor(this,  R.color.oldGloryGrey);
         if (rep.getMyParty().equals("Republican")) {
-            color = ContextCompat.getColor(this, R.color.oldGloryRed);
+            color = ContextCompat.getColor(this,  R.color.oldGloryRed);
         } else if (rep.getMyParty().equals("Democratic")) {
-            color = ContextCompat.getColor(this, R.color.oldGloryBlue);
+            color = ContextCompat.getColor(this,  R.color.oldGloryBlue);
+        } else if (rep.getMyParty().equals("Green")) {
+            color = ContextCompat.getColor(this,  R.color.oldGloryGreen);
+        } else if (rep.getMyParty().equals("Libertarian")) {
+            color = ContextCompat.getColor(this,  R.color.oldGloryYellow);
         }
         mHomeLayout.setBackgroundColor(color);
     }

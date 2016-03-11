@@ -50,7 +50,6 @@ public class WatchListenerService extends WearableListenerService {
                         representatives.add(new Representative(rep));
                     }
                     intent.putExtra("REPRESENTATIVES", representatives);
-                    intent.putExtra("COUNTY", dataMap.getString("COUNTY"));
                     intent.putExtra("VOTES", dataMap.getStringArrayList("VOTES"));
                     startActivity(intent);
                 }

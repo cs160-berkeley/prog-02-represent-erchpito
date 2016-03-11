@@ -35,28 +35,25 @@ public class PhoneListenerService extends WearableListenerService {
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "DataMap received on phone: " + dataMap);
 
-                    int zipcode = RepresentCalculator.findRandomZipCode();
-                    String location = RepresentCalculator.findLocation(zipcode);
-                    String district = RepresentCalculator.findCongressionalDistrict(zipcode);
-                    String county = RepresentCalculator.findCounty(zipcode);
+                    String zipcode = RepresentCalculator.findRandomZipCode();
+                    String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
                     int color = RepresentCalculator.findColor(zipcode, this);
-                    ArrayList<String> votes = RepresentCalculator.find2012Vote(zipcode);
+                    ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
                     ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
 
                     Intent intent = new Intent(this, CongressionalActivity.class);
-                    intent.putExtra("LOCATION", location);
-                    intent.putExtra("DISTRICT", district);
+                    intent.putExtra("LOCATION", location[0]);
+                    intent.putExtra("DISTRICT", location[1]);
                     intent.putExtra("REPRESENTATIVES", representatives);
                     intent.putExtra("COLOR", color);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
 
                     Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
-                    serviceIntent.putExtra("LOCATION", location);
-                    serviceIntent.putExtra("DISTRICT", district);
+                    serviceIntent.putExtra("LOCATION", location[0]);
+                    serviceIntent.putExtra("DISTRICT", location[1]);
                     serviceIntent.putExtra("REPRESENTATIVES", representatives);
                     serviceIntent.putExtra("COLOR", color);
-                    serviceIntent.putExtra("COUNTY", county);
                     serviceIntent.putExtra("VOTES", votes);
                     startService(serviceIntent);
 
@@ -66,7 +63,7 @@ public class PhoneListenerService extends WearableListenerService {
                     Log.d(TAG, "DataMap received on phone: " + dataMap);
 
                     Intent intent = new Intent(this, DetailedActivity.class);
-                    Representative rep = RepresentCalculator.findRepresentatives(dataMap.getInt("ZIP")).get(dataMap.getInt("INDEX"));
+                    Representative rep = RepresentCalculator.findRepresentatives(dataMap.getString("ZIP")).get(dataMap.getInt("INDEX"));
                     intent.putExtra("REPRESENTATIVE", rep);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);

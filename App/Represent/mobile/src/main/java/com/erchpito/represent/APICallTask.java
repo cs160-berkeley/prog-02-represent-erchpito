@@ -22,7 +22,7 @@ public final class APICallTask extends AsyncTask<String, Void, JSONObject> {
 
     private static final String TAG = "APICallTask";
     private static final String SUNLIGHT_API_KEY = "80e53d59d8394acabadf9a487bf502c6";
-    private static final String GOOGLE_MAP_API_KEY = "80e53d59d8394acabadf9a487bf502c6";
+    private static final String GOOGLE_MAP_API_KEY = "AIzaSyAEuJ0TBnlbepU7WVHHw64mU9SiRyXwb-U";
     private static final String TWITTER_API_KEY = "80e53d59d8394acabadf9a487bf502c6";
 
     protected void onPreExecute() {
@@ -34,8 +34,8 @@ public final class APICallTask extends AsyncTask<String, Void, JSONObject> {
         String call = params[0];
         if (call.contains("congress.api.sunlightfoundation.com")) {
             call += "&apikey=" + SUNLIGHT_API_KEY;
-        } else if (call.contains("map.google.com")) {
-            call += "&apikey=" + GOOGLE_MAP_API_KEY;
+        } else if (call.contains("maps.googleapis.com")) {
+            call += "&key=" + GOOGLE_MAP_API_KEY;
         } else if (call.contains("twitter.com")) {
             call += "&apikey=" + TWITTER_API_KEY;
         }
@@ -50,9 +50,9 @@ public final class APICallTask extends AsyncTask<String, Void, JSONObject> {
 
             url = new URL(call);
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(true);
-            urlConnection.setDoInput(true);
+//            urlConnection.setRequestMethod("GET");
+//            urlConnection.setDoOutput(true);
+//            urlConnection.setDoInput(true);
             urlConnection.connect();
 
             bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -67,7 +67,7 @@ public final class APICallTask extends AsyncTask<String, Void, JSONObject> {
             result = (JSONObject) new JSONTokener(response).nextValue();
 
         } catch (Exception e) {
-            Log.e("ERROR", e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
             return null;
         }
 

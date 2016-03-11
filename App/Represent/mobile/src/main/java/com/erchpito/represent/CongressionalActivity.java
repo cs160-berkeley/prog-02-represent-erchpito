@@ -91,11 +91,15 @@ public class CongressionalActivity extends AppCompatActivity {
                 }
             });
 
-            int color = ContextCompat.getColor(mContext,  R.color.grey);
+            int color = ContextCompat.getColor(mContext,  R.color.oldGloryGrey);
             if (rep.getMyParty().equals("Republican")) {
                 color = ContextCompat.getColor(mContext,  R.color.oldGloryRed);
             } else if (rep.getMyParty().equals("Democratic")) {
                 color = ContextCompat.getColor(mContext,  R.color.oldGloryBlue);
+            } else if (rep.getMyParty().equals("Green")) {
+                color = ContextCompat.getColor(mContext,  R.color.oldGloryGreen);
+            } else if (rep.getMyParty().equals("Libertarian")) {
+                color = ContextCompat.getColor(mContext,  R.color.oldGloryYellow);
             }
             home.setBackgroundColor(color);
 

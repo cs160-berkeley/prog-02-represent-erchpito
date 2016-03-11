@@ -6,6 +6,9 @@
 
     <color name="oldGloryBlue">#3C3B6E</color>
     <color name="oldGloryRed">#B22234</color>
+    <color name="oldGloryGrey">#696969</color>
+    <color name="oldGloryGreen">#63A861</color>
+    <color name="oldGloryYellow">#ECD133</color>
 
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#DADADA</color>

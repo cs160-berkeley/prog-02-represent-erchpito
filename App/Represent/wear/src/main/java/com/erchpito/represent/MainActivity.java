@@ -37,7 +37,6 @@ public class MainActivity extends WearableActivity implements WearableListView.C
     private Typeface font;
     private String mLocation;
     private String mDistrict;
-    private String mCounty;
     private int mColor;
     private double accelersum;
     private ArrayList<Representative> mRepresentatives;
@@ -120,7 +119,6 @@ public class MainActivity extends WearableActivity implements WearableListView.C
             mDistrict = bundle.getString("DISTRICT");
             mColor = bundle.getInt("COLOR");
             mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
-            mCounty = bundle.getString("COUNTY");
             mVotes = bundle.getStringArrayList("VOTES");
         } else {
             finish();
@@ -142,9 +140,9 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         mDistrictText.setTypeface(font);
 
         mVoteText = (TextView) findViewById(R.id.vote_text);
-        String render = "2012 Presidential Vote\n" + mCounty + "\n\n";
-        for (String candidate : mVotes) {
-            render += candidate + "\n\n";
+        String render = "2012 Presidential Vote\n" + mVotes.get(0) + "\n\n";
+        for (int i = 1; i < mVotes.size(); i++) {
+            render += mVotes.get(i) + "\n\n";
         }
         mVoteText.setText(render);
         mVoteText.setTypeface(font);
@@ -249,7 +247,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         intent.putExtra("REPRESENTATIVE", mRepresentatives.get(tag));
         intent.putExtra("ACTION", "detailed");
         intent.putExtra("INDEX", tag);
-        intent.putExtra("ZIP", Integer.parseInt(mLocation.substring(mLocation.length() - 5)));
+        intent.putExtra("ZIP", mLocation.substring(mLocation.length() - 5));
         Log.d(TAG, "Starting Detailed View");
         startActivity(intent);
     }

@@ -45,7 +45,6 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
         }
 
         DATAMAP.putDataMapArrayList("REPRESENTATIVES", representatives);
-        DATAMAP.putString("COUNTY", bundle.getString("COUNTY"));
         DATAMAP.putStringArrayList("VOTES", bundle.getStringArrayList("VOTES"));
         DATAMAP.putLong("TIME", System.currentTimeMillis());
         Log.d(TAG, "DataMap produced");

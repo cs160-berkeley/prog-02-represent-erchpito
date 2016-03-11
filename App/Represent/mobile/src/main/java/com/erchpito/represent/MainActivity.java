@@ -4,8 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,11 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.erchpito.common.Representative;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
 
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText mZipEdit;
     private Button mZipButton;
     private Button mCurrentButton;
+
+    private GoogleApiClient mApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +71,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // If the event is a key-down event on the "enter" button
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    toCongressionalView(Integer.parseInt(mZipEdit.getText().toString()));
+                    toCongressionalView(mZipEdit.getText().toString());
                     return true;
                 }
                 return false;
             }
         });
+
+        mApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
     }
 
     public void enterLocation(View view) {
@@ -97,38 +107,62 @@ public class MainActivity extends AppCompatActivity {
 //                        });
 //            }
 //        }, 0);
-        toCongressionalView(RepresentCalculator.findZipCode(0, 0));
-    }
-
-    public void findLocation(View view) {
-        // make EditText view
-        int zipcode = 94704;
+        String zipcode = "94704";
         toCongressionalView(zipcode);
     }
 
-    public void toCongressionalView(int zipcode) {
-        String location = RepresentCalculator.findLocation(zipcode);
-        String district = RepresentCalculator.findCongressionalDistrict(zipcode);
-        String county = RepresentCalculator.findCounty(zipcode);
-        int color = RepresentCalculator.findColor(zipcode, this);
-        ArrayList<String> votes = RepresentCalculator.find2012Vote(zipcode);
+    public void findLocation(View view) {
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mApiClient);
+        if (mLastLocation != null) {
+            toCongressionalView(RepresentCalculator.findZipCode(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            return;
+        }
+        Log.d(TAG, "unable to get last location");
+        return;
+    }
+
+    public void toCongressionalView(String zipcode) {
+        String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
+        ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
         ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
+        int color = RepresentCalculator.findColor(zipcode, this);
 
         Intent intent = new Intent(this, CongressionalActivity.class);
-        intent.putExtra("LOCATION", location);
-        intent.putExtra("DISTRICT", district);
+        intent.putExtra("LOCATION", location[0]);
+        intent.putExtra("DISTRICT", location[1]);
         intent.putExtra("REPRESENTATIVES", representatives);
         intent.putExtra("COLOR", color);
         startActivity(intent);
 
         Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
-        serviceIntent.putExtra("LOCATION", location);
-        serviceIntent.putExtra("DISTRICT", district);
+        serviceIntent.putExtra("LOCATION", location[0]);
+        serviceIntent.putExtra("DISTRICT", location[1]);
         serviceIntent.putExtra("REPRESENTATIVES", representatives);
         serviceIntent.putExtra("COLOR", color);
-        serviceIntent.putExtra("COUNTY", county);
         serviceIntent.putExtra("VOTES", votes);
         Log.d(TAG, "starting service");
         startService(serviceIntent);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mApiClient.connect();
+        mZipEdit.setText("");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) { ; }
+
+    @Override
+    public void onConnectionSuspended(int cause) { ; }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) { ; }
 }

@@ -60,7 +60,19 @@ public class Representative implements Parcelable {
         this();
         mFirstName = firstName;
         mLastName = lastName;
-        mParty = party;
+        if (party.equals("D")) {
+            mParty = "Democratic";
+        } else if (party.equals("R")) {
+            mParty = "Republican";
+        } else if (party.equals("I")) {
+            mParty = "Independent";
+        } else if (party.equals("G")) {
+            mParty = "Green";
+        } else if (party.equals("L")) {
+            mParty = "Libertarian";
+        } else {
+            mParty = party;
+        }
     }
 
     private Representative(Parcel in) {
@@ -130,6 +142,8 @@ public class Representative implements Parcelable {
     public String getMyCommittees(int i) { return mCommittees.get(i); }
 
     public String getMyEmail() { return mEmail; }
+
+    public boolean getMyHouse() { return isSenator(); }
 
     public String getMyLastTweet() { return mLastTweet; }
 

@@ -53,18 +53,22 @@ public class DetailedActivity extends WearableActivity {
         mNameText.setText(((rep.isSenator()) ? "Sen.\n" : "Rep.\n") + rep.getMyName() + " - " + rep.getMyParty().substring(0, 1));
 
         mField = (RelativeLayout) findViewById(R.id.field);
-        int color = ContextCompat.getColor(this, R.color.grey);
+        int color = ContextCompat.getColor(this,  R.color.oldGloryGrey);
         if (rep.getMyParty().equals("Republican")) {
-            color = ContextCompat.getColor(this, R.color.oldGloryRed);
+            color = ContextCompat.getColor(this,  R.color.oldGloryRed);
         } else if (rep.getMyParty().equals("Democratic")) {
-            color = ContextCompat.getColor(this, R.color.oldGloryBlue);
+            color = ContextCompat.getColor(this,  R.color.oldGloryBlue);
+        } else if (rep.getMyParty().equals("Green")) {
+            color = ContextCompat.getColor(this,  R.color.oldGloryGreen);
+        } else if (rep.getMyParty().equals("Libertarian")) {
+            color = ContextCompat.getColor(this,  R.color.oldGloryYellow);
         }
         mField.setBackgroundColor(color);
 
         Intent serviceIntent = new Intent(this, WatchToPhoneService.class);
         serviceIntent.putExtra("ACTION", bundle.getString("ACTION"));
         serviceIntent.putExtra("INDEX", bundle.getInt("INDEX"));
-        serviceIntent.putExtra("ZIP", bundle.getInt("ZIP"));
+        serviceIntent.putExtra("ZIP", bundle.getString("ZIP"));
         startService(serviceIntent);
     }
 }
