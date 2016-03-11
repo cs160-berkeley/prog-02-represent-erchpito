@@ -36,7 +36,7 @@ public class WatchToPhoneService extends Service implements GoogleApiClient.Conn
         DATAMAP.putLong("TIME", System.currentTimeMillis());
         if (intent.hasExtra("INDEX")) {
             DATAMAP.putInt("INDEX", bundle.getInt("INDEX"));
-            DATAMAP.putInt("ZIP", bundle.getInt("ZIP"));
+            DATAMAP.putString("ZIP", bundle.getString("ZIP"));
         }
         final String PATH = bundle.getString("ACTION");
         Log.d(TAG, "DataMap produced");

@@ -99,8 +99,10 @@ public final class RepresentCalculator {
                     Log.d(TAG, subResult.toString());
                     for (int j = 0; j < subResult.length(); j++) {
                         JSONObject bill = subResult.getJSONObject(j);
-                        rep.addBill(bill.getString("introduced_on"), bill.getInt("number"), (bill.getString("short_title") != null) ? bill.getString("short_title") : bill.getString("official_title"));
-                        Log.d(TAG, "Bill: " + ((bill.getString("short_title") != null) ? bill.getString("short_title") : bill.getString("official_title")));
+                        if (!bill.getString("short_title").equals("null")) {
+                            rep.addBill(bill.getString("introduced_on"), bill.getInt("number"), bill.getString("short_title"));
+                            Log.d(TAG, "Bill: " + bill.getString("short_title"));
+                        }
                     }
 
                     rep.setMyPortrait(R.drawable.boxer);

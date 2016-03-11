@@ -68,13 +68,13 @@ public class DetailedActivity extends AppCompatActivity {
         mEmailText.setText(rep.getMyEmail());
 
         String render = "";
-        render += "Committees:\n";
+        render += "Committees:\n\n";
         for (int i = 0; i < rep.getNumCommittees(); i++) {
-            render += "\t" + rep.getMyCommittees(i) + "\n";
+            render += rep.getMyCommittees(i) + "\n";
         }
-        render += "\nSponsored Bills:\n";
+        render += "\nSponsored Bills:\n\n";
         for (int i = 0; i < rep.getNumBills(); i++) {
-            render += "\t" + rep.getMyBills(i) + "\n\n";
+            render += rep.getMyBills(i) + "\n\n";
         }
         mCareerText.setText(render);
 

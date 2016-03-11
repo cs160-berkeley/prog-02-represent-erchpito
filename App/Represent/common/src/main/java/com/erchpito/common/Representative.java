@@ -1,14 +1,13 @@
 package com.erchpito.common;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by erchpito on 28/2/2016.
@@ -178,10 +177,16 @@ public class Representative implements Parcelable {
     }
 
     public void setMyTerm(String start, String end) {
-        mStartTerm = start;
-        mEndTerm = end;
+        try {
+            SimpleDateFormat oldFormat = new SimpleDateFormat("yyyy-mm-dd");
+            SimpleDateFormat newFormat = new SimpleDateFormat("MMM. dd, yyyy");
+            mStartTerm = newFormat.format(oldFormat.parse(start));
+            mEndTerm = newFormat.format(oldFormat.parse(end));
+        } catch (Exception e) {
+            mStartTerm = "";
+            mEndTerm = "";
+        }
     }
-
 }
 
 class Bill implements Parcelable {
@@ -193,7 +198,13 @@ class Bill implements Parcelable {
 
     public Bill(boolean inSenate, String date, int number, String title) {
         mInSenate = inSenate;
-        mDate = date;
+        try {
+            SimpleDateFormat oldFormat = new SimpleDateFormat("yyyy-mm-dd");
+            SimpleDateFormat newFormat = new SimpleDateFormat("MMM. dd, yyyy");
+            mDate = newFormat.format(oldFormat.parse(date));
+        } catch (Exception e) {
+            mDate = "";
+        }
         mNumber = number;
         mTitle = title;
     }

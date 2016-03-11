@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.erchpito.common.Representative;
 import com.google.android.gms.common.ConnectionResult;
@@ -108,7 +109,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 //            }
 //        }, 0);
         String zipcode = "94704";
-        toCongressionalView(zipcode);
+        if (RepresentCalculator.verifyZipCode(zipcode)) {
+            toCongressionalView(zipcode);
+        }
+        Log.d(TAG, "non-real postal code");
+        Toast.makeText(this, "Unable to find postal code", Toast.LENGTH_LONG).show();
+        return;
+
     }
 
     public void findLocation(View view) {
@@ -118,30 +125,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             return;
         }
         Log.d(TAG, "unable to get last location");
+        Toast.makeText(this, "Unable to get location", Toast.LENGTH_LONG).show();
         return;
     }
 
     public void toCongressionalView(String zipcode) {
-        String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
-        ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
-        ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
-        int color = RepresentCalculator.findColor(zipcode, this);
+        try {
+            String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
+            ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
+            ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode);
+            int color = RepresentCalculator.findColor(zipcode, this);
 
-        Intent intent = new Intent(this, CongressionalActivity.class);
-        intent.putExtra("LOCATION", location[0]);
-        intent.putExtra("DISTRICT", location[1]);
-        intent.putExtra("REPRESENTATIVES", representatives);
-        intent.putExtra("COLOR", color);
-        startActivity(intent);
+            Intent intent = new Intent(this, CongressionalActivity.class);
+            intent.putExtra("LOCATION", location[0]);
+            intent.putExtra("DISTRICT", location[1]);
+            intent.putExtra("REPRESENTATIVES", representatives);
+            intent.putExtra("COLOR", color);
+            startActivity(intent);
 
-        Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
-        serviceIntent.putExtra("LOCATION", location[0]);
-        serviceIntent.putExtra("DISTRICT", location[1]);
-        serviceIntent.putExtra("REPRESENTATIVES", representatives);
-        serviceIntent.putExtra("COLOR", color);
-        serviceIntent.putExtra("VOTES", votes);
-        Log.d(TAG, "starting service");
-        startService(serviceIntent);
+            Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
+            serviceIntent.putExtra("LOCATION", location[0]);
+            serviceIntent.putExtra("DISTRICT", location[1]);
+            serviceIntent.putExtra("REPRESENTATIVES", representatives);
+            serviceIntent.putExtra("COLOR", color);
+            serviceIntent.putExtra("VOTES", votes);
+            Log.d(TAG, "starting service");
+            startService(serviceIntent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Unable to retrieve data", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
