@@ -2,6 +2,7 @@ package com.erchpito.represent;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -107,7 +108,7 @@ public class CongressionalActivity extends AppCompatActivity {
                 }
             });
 
-            int color = ContextCompat.getColor(mContext,  R.color.oldGloryGrey);
+            int color = ContextCompat.getColor(mContext, R.color.oldGloryGrey);
             if (rep.getMyParty().equals("Republican")) {
                 color = ContextCompat.getColor(mContext,  R.color.oldGloryRed);
             } else if (rep.getMyParty().equals("Democratic")) {
@@ -118,6 +119,16 @@ public class CongressionalActivity extends AppCompatActivity {
                 color = ContextCompat.getColor(mContext,  R.color.oldGloryYellow);
             }
             home.setBackgroundColor(color);
+            // via ProgrammingLife.io
+            float[] hsv = new float[3];
+            int brandColor = Color.parseColor(String.format("#%06X", (0xFFFFFF & color)));
+            Color.colorToHSV(brandColor, hsv);
+            hsv[1] = hsv[1] + 0.1f;
+            hsv[2] = hsv[2] - 0.1f;
+            int argbColor = Color.HSVToColor(hsv);
+            getWindow().setStatusBarColor(Color.parseColor(String.format("#%08X", argbColor)));
+            mHomeLayout.setElevation((float) 8);
+            button.setBackgroundColor(Color.parseColor(String.format("#%08X", argbColor)));
 
             return convertView;
         }
@@ -150,6 +161,15 @@ public class CongressionalActivity extends AppCompatActivity {
 
         mHomeLayout = (RelativeLayout) findViewById(R.id.home);
         mHomeLayout.setBackgroundColor(mColor);
+        // via ProgrammingLife.io
+        float[] hsv = new float[3];
+        int brandColor = Color.parseColor(String.format("#%06X", (0xFFFFFF & mColor)));
+        Color.colorToHSV(brandColor, hsv);
+        hsv[1] = hsv[1] + 0.1f;
+        hsv[2] = hsv[2] - 0.1f;
+        int argbColor = Color.HSVToColor(hsv);
+        getWindow().setStatusBarColor(Color.parseColor(String.format("#%08X", argbColor)));
+        mHomeLayout.setElevation((float) 8);
     }
 
 }

@@ -11,8 +11,7 @@
     <RelativeLayout android:id="@+id/field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="8dp"
-        android:clipToPadding="false">
+        android:elevation="8dp">
 
         <TextView android:id="@+id/location_text"
             android:layout_width="match_parent"

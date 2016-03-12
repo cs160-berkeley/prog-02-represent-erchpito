@@ -1,6 +1,7 @@
 package com.erchpito.represent;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -99,6 +99,26 @@ public final class RepresentCalculator {
         Log.d(TAG, "findDistrict(" + latlng + ") = " + districtHash.get(latlng));
         return districtHash.get(latlng);
     }
+
+//    public static Bitmap findMap(String latlng) {
+//        if (!mapHash.containsKey(latlng)) {
+//            try {
+//                JSONArray result = new APICallTask().execute("http://maps.googleapis.com/maps/api/staticmap?center=" + latlng + "&size=640x400&zoom=10&style=element:labels|visibility:off&style=element:geometry.stroke|visibility:off&style=feature:landscape|element:geometry|saturation:-100&style=feature:water|saturation:-100|invert_lightness:true").get().getJSONArray("results");
+//                JSONArray subresult = result.getJSONObject(0).getJSONArray("address_components");
+//                for (int i = 0; i < subresult.length(); i++) {
+//                    JSONObject subobject = subresult.getJSONObject(i);
+//                    if (subobject.getJSONArray("types").getString(0).equals("postal_code")) {
+//                        picture = subobject.getString("short_name");
+//                    }
+//                }
+//                mapHash.put(latlng, picture);
+//            } catch (Exception e) {
+//                Log.e(TAG, e.getMessage(), e);
+//            }
+//        }
+//        Log.d(TAG, "findMap(" + latlng + ") = " + mapHash.get(latlng));
+//        return mapHash.get(latlng);
+//    }
 
     public static String findRandomZipCode(Context context) {
         if (zipcodes.isEmpty()) {

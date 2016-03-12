@@ -1,8 +1,7 @@
 package com.erchpito.represent;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
@@ -22,6 +21,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -35,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private RelativeLayout mButtonField;
 
     private TextView mRepresentText;
+    private TextView mInfoText;
     private EditText mZipEdit;
-    private Button mZipButton;
     private Button mCurrentButton;
 
     private GoogleApiClient mApiClient;
@@ -49,15 +50,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         font = Typeface.createFromAsset(getAssets(), "fonts/LeagueSpartan-Bold.otf");
         mAnimationDuration = getResources().getInteger(android.R.integer.config_longAnimTime);
 
-//        mButtonField = (RelativeLayout) findViewById(R.id.button_field);
-
         mRepresentText = (TextView) findViewById(R.id.represent_text);
         mRepresentText.setTypeface(font);
 
-//        mZipButton = (Button) findViewById(R.id.zip_button);
-//        mZipButton.setTypeface(font);
+        mInfoText = (TextView) findViewById(R.id.info_text);
+        mInfoText.setTypeface(font);
 
-//        mCurrentButton = (Button) findViewById(R.id.current_button);
         mCurrentButton = (Button) findViewById(R.id.zip_current);
         mCurrentButton.setTypeface(font);
 
@@ -88,39 +86,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-    }
 
-    public void enterLocation(View view) {
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mZipEdit.setAlpha(0f);
-//                mZipEdit.setVisibility(View.VISIBLE);
-//
-//                mZipEdit.animate()
-//                        .alpha(1f)
-//                        .setDuration(mAnimationDuration)
-//                        .setListener(null);
-//
-//                mButtonField.animate()
-//                        .alpha(0f)
-//                        .setDuration(mAnimationDuration)
-//                        .setListener(new AnimatorListenerAdapter() {
-//                            @Override
-//                            public void onAnimationEnd(Animator animation) {
-//                                mButtonField.setVisibility(View.GONE);
-//                            }
-//                        });
-//            }
-//        }, 0);
-        String zipcode = "94704";
-        if (RepresentCalculator.verifyZipCode(zipcode, this)) {
-            toCongressionalView(zipcode);
-        }
-        Log.d(TAG, "non-real postal code");
-        Toast.makeText(this, "Unable to find postal code", Toast.LENGTH_LONG).show();
-        return;
-
+        // via ProgrammingLife.io
+        float[] hsv = new float[3];
+        int brandColor = Color.parseColor(String.format("#%06X", (0xFFFFFF & ContextCompat.getColor(this, R.color.black))));
+        Color.colorToHSV(brandColor, hsv);
+        hsv[1] = hsv[1] + 0.1f;
+        hsv[2] = hsv[2] - 0.1f;
+        int argbColor = Color.HSVToColor(hsv);
+        getWindow().setStatusBarColor(Color.parseColor(String.format("#%08X", argbColor)));
     }
 
     public void findLocation(View view) {

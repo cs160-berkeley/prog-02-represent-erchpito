@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/colorPrimary"
+    android:background="@color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.erchpito.represent.MainActivity"
@@ -24,63 +24,33 @@
         android:layout_centerVertical="true"
         android:gravity="center"
 
-        android:textSize="50dp"
-        android:text="Represent!"/>
+        android:textSize="35dp"
+        android:text="REPRESENT!"/>
 
-    <!--<RelativeLayout android:id="@+id/button_field"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
+    <TextView android:id="@+id/info_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
 
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_below="@id/represent_text"-->
-        <!--android:layout_margin="20dp">-->
+        android:layout_below="@id/represent_text"
+        android:layout_centerVertical="true"
+        android:gravity="center"
 
-        <!--<Button android:id="@+id/zip_button"-->
-            <!--android:layout_width="150dp"-->
-            <!--android:layout_height="?android:attr/listPreferredItemHeight"-->
-
-            <!--android:gravity="center"-->
-            <!--android:layout_alignParentLeft="true"-->
-
-            <!--android:background="@color/oldGloryBlue"-->
-            <!--android:onClick="enterLocation"-->
-            <!--android:text="Enter Zipcode" />-->
-
-        <!--<Button android:id="@+id/current_button"-->
-            <!--android:layout_width="150dp"-->
-            <!--android:layout_height="?android:attr/listPreferredItemHeight"-->
-
-            <!--android:gravity="center"-->
-            <!--android:layout_alignParentRight="true"-->
-
-            <!--android:background="@color/oldGloryRed"-->
-            <!--android:onClick="findLocation"-->
-            <!--android:text="Use Current\nLocation" />-->
-    <!--</RelativeLayout>-->
-
-    <!--<EditText android:id="@+id/zip_edit"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="?android:attr/listPreferredItemHeight"-->
-
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_below="@id/represent_text"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_margin="20dp"-->
-
-        <!--android:background="@color/oldGloryBlue"-->
-        <!--android:visibility="invisible"/>-->
+        android:textSize="15dp"
+        android:text="Find your local Congress members:"/>
 
     <EditText android:id="@+id/zip_edit"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
 
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/represent_text"
+        android:layout_below="@id/info_text"
         android:gravity="center"
         android:layout_margin="20dp"
 
         android:background="@color/oldGloryBlue"
         android:visibility="visible"
+        android:elevation="8dp"
+        android:textSize="15sp"
         android:hint="ENTER ZIPCODE"/>
 
     <Button android:id="@+id/zip_current"
@@ -90,11 +60,14 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/zip_edit"
         android:gravity="center"
-        android:layout_margin="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
 
         android:background="@color/oldGloryRed"
         android:visibility="visible"
+        android:elevation="8dp"
         android:text="Use Current Location"
+        android:textSize="15sp"
         android:onClick="findLocation"/>
 
 </RelativeLayout>
