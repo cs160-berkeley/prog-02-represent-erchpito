@@ -113,34 +113,38 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return;
     }
 
-    public void toCongressionalView(final String latlng) {
+    public void toCongressionalView(String latlng) {
         mCurrentButton.setText("Loading...");
-        RepresentCalculator.getZipCode(latlng);
-        String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
-        ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
-        ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
-        int color = RepresentCalculator.findColor(latlng, this);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        RepresentCalculator.findMap(latlng).compress(Bitmap.CompressFormat.JPEG, 50, stream);
-        byte[] map = stream.toByteArray();
-
-        Intent intent = new Intent(this, CongressionalActivity.class);
-        intent.putExtra("LOCATION", location[0]);
-        intent.putExtra("DISTRICT", location[1]);
-        intent.putExtra("REPRESENTATIVES", representatives);
-        intent.putExtra("COLOR", color);
-        Log.d(TAG, "starting activity");
-        startActivity(intent);
-
-        Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
-        serviceIntent.putExtra("LOCATION", location[0]);
-        serviceIntent.putExtra("DISTRICT", location[1]);
-        serviceIntent.putExtra("REPRESENTATIVES", representatives);
-        serviceIntent.putExtra("COLOR", color);
-        serviceIntent.putExtra("VOTES", votes);
-        serviceIntent.putExtra("MAP", map);
-        Log.d(TAG, "starting service");
+        Intent serviceIntent = new Intent(this, PhoneToPhoneService.class);
+        serviceIntent.putExtra("ACTION", "new");
+        serviceIntent.putExtra("LATLNG", latlng);
         startService(serviceIntent);
+//        RepresentCalculator.getZipCode(latlng);
+//        String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
+//        ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
+//        ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
+//        int color = RepresentCalculator.findColor(latlng, this);
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        RepresentCalculator.findMap(latlng).compress(Bitmap.CompressFormat.JPEG, 50, stream);
+//        byte[] map = stream.toByteArray();
+//
+//        Intent intent = new Intent(this, CongressionalActivity.class);
+//        intent.putExtra("LOCATION", location[0]);
+//        intent.putExtra("DISTRICT", location[1]);
+//        intent.putExtra("REPRESENTATIVES", representatives);
+//        intent.putExtra("COLOR", color);
+//        Log.d(TAG, "starting activity");
+//        startActivity(intent);
+//
+//        Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
+//        serviceIntent.putExtra("LOCATION", location[0]);
+//        serviceIntent.putExtra("DISTRICT", location[1]);
+//        serviceIntent.putExtra("REPRESENTATIVES", representatives);
+//        serviceIntent.putExtra("COLOR", color);
+//        serviceIntent.putExtra("VOTES", votes);
+//        serviceIntent.putExtra("MAP", map);
+//        Log.d(TAG, "starting service");
+//        startService(serviceIntent);
 //        try {
 //            RepresentCalculator.getZipCode(latlng);
 //            String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
