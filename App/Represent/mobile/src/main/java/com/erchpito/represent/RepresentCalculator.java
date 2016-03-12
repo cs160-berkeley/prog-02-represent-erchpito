@@ -14,15 +14,19 @@ import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.models.Tweet;
-import com.twitter.sdk.android.core.services.StatusesService;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -37,14 +41,19 @@ public final class RepresentCalculator {
     private static final String TWITTER_KEY = "yj6GsqrlTzwAVqEEahPSYFtZs";
     private static final String TWITTER_SECRET = "KJkdLmgO3zc6w8A0kRCcpZV4YIXTY9Xe2BKS6h2zuEEMLv12aW";
 
+    private static Object object;
+
+    private static ArrayList<String> zipcodes = new ArrayList<String>();
+
     private static HashMap<String, ArrayList<Representative>> repHash = new HashMap<String, ArrayList<Representative>>();
     private static HashMap<String, String> districtHash = new HashMap<String, String>();
     private static HashMap<String, ArrayList<String>> voteHash = new HashMap<String, ArrayList<String>>();
     private static HashMap<String, String> latlngHash = new HashMap<String, String>();
+    private static HashMap<String, String> zipHash = new HashMap<String, String>();
     private static HashMap<String, Boolean> verifyHash = new HashMap<String, Boolean>();
 
-    public static int findColor(String zipcode, Context context) {
-        ArrayList<Representative> reps = repHash.get(zipcode);
+    public static int findColor(String latlng, Context context) {
+        ArrayList<Representative> reps = repHash.get(latlng);
         for (Representative rep : reps) {
             if (!rep.getMyHouse()) {
                 if (rep.getMyParty().equals("Democratic")) {
@@ -63,12 +72,13 @@ public final class RepresentCalculator {
         return ContextCompat.getColor(context, R.color.oldGloryGrey);
     }
 
-    public static String findDistrict(String zipcode) {
-        if (!districtHash.containsKey(zipcode)) {
+    public static String findDistrict(String latlng) {
+        if (!districtHash.containsKey(latlng)) {
             try {
+                String [] coord = latlng.split(",");
                 String output = "";
-                JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/districts/locate?zip=" + zipcode).get().getJSONArray("results");
-                output += result.getJSONObject(0).getString("state") + ", " + zipcode + "\n";
+                JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/districts/locate?latitude=" + coord[0] + "&longitude=" + coord[1]).get().getJSONArray("results");
+                output += result.getJSONObject(0).getString("state") + ", " + zipHash.get(latlng) + "\n";
                 int num = result.getJSONObject(0).getInt("district");
                 if (num % 10 == 1 && num != 11) {
                     output += num + "st Congressional District";
@@ -76,33 +86,68 @@ public final class RepresentCalculator {
                     output += num + "nd Congressional District";
                 } else if (num % 10 == 3 && num != 13) {
                     output += num + "rd Congressional District";
+                } else if (num == 0) {
+                    output += " ";
                 } else {
                     output += num + "th Congressional District";
                 }
-                districtHash.put(zipcode, output);
+                districtHash.put(latlng, output);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
-        Log.d(TAG, "findDistrict(" + zipcode + ") = " + districtHash.get(zipcode));
-        return districtHash.get(zipcode);
+        Log.d(TAG, "findDistrict(" + latlng + ") = " + districtHash.get(latlng));
+        return districtHash.get(latlng);
     }
 
-    public static String findRandomZipCode() {
-        return findZipCode(0.0, 0.0);
-    }
-
-    public static ArrayList<Representative> findRepresentatives(String zipcode, Context context) {
-        if (!repHash.containsKey(zipcode)) {
+    public static String findRandomZipCode(Context context) {
+        if (zipcodes.isEmpty()) {
             try {
+                InputStream inputStream = context.getAssets().open("postal_codes.csv");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                Log.d(TAG, "read csv");
+                String csvLine;
+                while ((csvLine = reader.readLine()) != null) {
+                    zipcodes.add(csvLine);
+                }
+                reader.close();
+                Log.d(TAG, "closing reader");
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+        Random rand = new Random();
+        String randomZip = "00000";
+        boolean tilItsRight = true;
+        while (tilItsRight) {
+            try {
+                randomZip = zipcodes.get(rand.nextInt(zipcodes.size() - 1) + 1);
+                String[] coord = getLatLng(randomZip).split(",");
+                JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/districts/locate?" + "latitude=" + coord[0] + "&longitude=" + coord[1]).get().getJSONArray("results");
+                result.getJSONObject(0).getInt("district");
+                tilItsRight = false;
+            } catch (JSONException e) {
+                ;
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+        Log.d(TAG, "findRandomZipCode() = " + randomZip);
+        return randomZip;
+    }
+
+    public static ArrayList<Representative> findRepresentatives(String latlng, Context context) {
+        if (!repHash.containsKey(latlng)) {
+            try {
+                String[] coord = latlng.split(",");
                 TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
                 Fabric.with(context, new Twitter(authConfig));
 
                 ArrayList<Representative> output = new ArrayList<Representative>();
-                JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/legislators/locate?" + "zip=" + zipcode).get().getJSONArray("results");
+                JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/legislators/locate?" + "latitude=" + coord[0] + "&longitude=" + coord[1]).get().getJSONArray("results");
                 for (int i = 0; i < result.length(); i++) {
                     JSONObject legislator = result.getJSONObject(i);
-                    Representative rep = new Representative(legislator.getString("first_name"), legislator.getString("last_name"), legislator.getString("party")); // party is just D or R
+                    final Representative rep = new Representative(legislator.getString("first_name"), legislator.getString("last_name"), legislator.getString("party")); // party is just D or R
                     rep.setMyHouse(legislator.getString("chamber").equals("senate"));
                     rep.setMyTerm(legislator.getString("term_start"), legislator.getString("term_end"));
                     rep.setMySocial(legislator.getString("website"), legislator.getString("oc_email"), legislator.getString("twitter_id")); // twitter_id sans @
@@ -128,6 +173,8 @@ public final class RepresentCalculator {
                     rep.setMyPortrait(R.drawable.boxer);
                     rep.setMyLastTweet("meow");
 
+                    object = new Object();
+
                     TwitterCore.getInstance().logInGuest(new Callback<AppSession>() {
                         @Override
                         public void success(Result<AppSession> appSessionResult) {
@@ -137,14 +184,20 @@ public final class RepresentCalculator {
                                 @Override
                                 public void success(Result<List<Tweet>> listResult) {
                                     for (Tweet tweet : listResult.data) {
-//                                        rep.setMyLastTweet(tweet.text);
+                                        rep.setMyLastTweet(tweet.text);
                                         Log.d("fabricstuff", "result: " + tweet.text + "  " + tweet.createdAt);
+                                        synchronized (object) {
+                                            object.notifyAll();
+                                        }
                                     }
                                 }
 
                                 @Override
                                 public void failure(TwitterException e) {
                                     e.printStackTrace();
+                                    synchronized (object) {
+                                        object.notifyAll();
+                                    }
                                 }
                             });
                         }
@@ -152,25 +205,37 @@ public final class RepresentCalculator {
                         @Override
                         public void failure(TwitterException e) {
                             e.printStackTrace();
+                            synchronized (object) {
+                                object.notifyAll();
+                            }
                         }
                     });
 
+//                    synchronized (object) {
+//                        try {
+//                            object.wait();
+//                            Log.d(TAG, "meow " + rep.getMyLastTweet());
+//                        } catch (InterruptedException e) {
+//                            Log.e("Message", "Interrupted Exception while getting lock" + e.getMessage());
+//                        }
+//                    }
+
                     output.add(rep);
                 }
-                repHash.put(zipcode, output);
+                repHash.put(latlng, output);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
-        Log.d(TAG, "findRepresentatives(" + zipcode + ") = " + repHash.get(zipcode));
-        return repHash.get(zipcode);
+        Log.d(TAG, "findRepresentatives(" + latlng + ") = " + repHash.get(latlng));
+        return repHash.get(latlng);
     }
 
-    public static ArrayList<String> findVote(String zipcode, int year, Context context) {
-        if (!voteHash.containsKey(zipcode)) {
+    public static ArrayList<String> findVote(String latlng, int year, Context context) {
+        if (!voteHash.containsKey(latlng)) {
             try {
                 String countyName = "";
-                JSONArray result = new APICallTask().execute("https://maps.googleapis.com/maps/api/geocode/json?address=" + zipcode + "&result_type=administrative_area_level_2").get().getJSONArray("results");
+                JSONArray result = new APICallTask().execute("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&result_type=administrative_area_level_2").get().getJSONArray("results");
                 JSONArray subresult = result.getJSONObject(0).getJSONArray("address_components");
                 for (int i = 0; i < subresult.length(); i++) {
                     JSONObject subobject = subresult.getJSONObject(i);
@@ -201,18 +266,17 @@ public final class RepresentCalculator {
                         break;
                     }
                 }
-                voteHash.put(zipcode, output);
+                voteHash.put(latlng, output);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
-        Log.d(TAG, "findVote(" + zipcode + ", " + year + ") = " + voteHash.get(zipcode));
-        return voteHash.get(zipcode);
+        Log.d(TAG, "findVote(" + latlng + ", " + year + ") = " + voteHash.get(latlng));
+        return voteHash.get(latlng);
     }
 
-    public static String findZipCode(double lat, double lon) {
-        String latlng = "" + lat + "," + lon;
-        if (!latlngHash.containsKey(latlng)) {
+    public static String getZipCode(String latlng) {
+        if (!zipHash.containsKey(latlng)) {
             try {
                 String zipcode = "00000";
                 JSONArray result = new APICallTask().execute("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&result_type=postal_code").get().getJSONArray("results");
@@ -223,36 +287,60 @@ public final class RepresentCalculator {
                         zipcode = subobject.getString("short_name");
                     }
                 }
-                latlngHash.put(latlng, zipcode);
+                zipHash.put(latlng, zipcode);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
         }
-        Log.d(TAG, "findZipCode(" + lat + ", " + lon + ") = " + latlngHash.get(latlng));
-        return latlngHash.get(latlng);
+        Log.d(TAG, "findZipCode(" + latlng + ") = " + zipHash.get(latlng));
+        return zipHash.get(latlng);
     }
 
-    public static boolean verifyZipCode(String zipcode) {
-        if (!verifyHash.containsKey(zipcode)) {
+    public static String getLatLng(String zipcode) {
+        if (!latlngHash.containsKey(zipcode)) {
             try {
-                boolean output = false;
-                JSONArray result = new APICallTask().execute("https://maps.googleapis.com/maps/api/geocode/json?address=" + zipcode + "&result_type=administrative_area_level_2").get().getJSONArray("results");
-                // this is more complicated because other countries can have a zipcode that's note valid in the US.
-//                JSONArray subresult = result.getJSONObject(0).getJSONArray("address_components");
-//                for (int i = 0; i < subresult.length(); i++) {
-//                    JSONObject subobject = subresult.getJSONObject(i);
-//                    if (subobject.getJSONArray("types").getString(0).equals("administrative_area_level_2")) {
-//                        countyName = subobject.getString("short_name");
-//                    }
-//                }
-                if (result.length() > 0) {
-                    output = true;
-                }
-
-                verifyHash.put(zipcode, output);
+                String latlng = "";
+                JSONArray result = new APICallTask().execute("https://maps.googleapis.com/maps/api/geocode/json?address=" + zipcode).get().getJSONArray("results");
+                JSONObject subresult = result.getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                latlng += subresult.getDouble("lat") + "," + subresult.getDouble("lng");
+                latlngHash.put(zipcode, latlng);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
+        }
+        Log.d(TAG, "findLatLng(" + zipcode + ") = " + latlngHash.get(zipcode));
+        return latlngHash.get(zipcode);
+    }
+
+    public static boolean verifyZipCode(String zipcode, Context context) {
+        if (!verifyHash.containsKey(zipcode)) {
+            if (zipcodes.isEmpty()) {
+                try {
+                    InputStream inputStream = context.getAssets().open("postal_codes.csv");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    Log.d(TAG, "read csv");
+                    String csvLine;
+                    while ((csvLine = reader.readLine()) != null) {
+                        zipcodes.add(csvLine);
+                    }
+                    reader.close();
+                    Log.d(TAG, "closing reader");
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
+            }
+            boolean inSunlight = false;
+            try {
+                String[] coord = getLatLng(zipcode).split(",");
+                JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/districts/locate?" + "latitude=" + coord[0] + "&longitude=" + coord[1]).get().getJSONArray("results");
+                result.getJSONObject(0).getInt("district");
+                inSunlight = true;
+            } catch (JSONException e) {
+                inSunlight = false;
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+            verifyHash.put(zipcode, zipcodes.contains(zipcode) && inSunlight);
         }
         Log.d(TAG, "VerifyZipCode(" + zipcode + ") = " + verifyHash.get(zipcode));
         return verifyHash.get(zipcode);

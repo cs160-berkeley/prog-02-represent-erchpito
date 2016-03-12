@@ -71,7 +71,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // If the event is a key-down event on the "enter" button
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    toCongressionalView(mZipEdit.getText().toString());
+                    String zipcode = mZipEdit.getText().toString();
+                    if (RepresentCalculator.verifyZipCode(zipcode, v.getContext())) {
+                        toCongressionalView(RepresentCalculator.getLatLng(zipcode));
+                    } else {
+                        Log.d(TAG, "non-real postal code");
+                        Toast.makeText(v.getContext(), "Unable to find postal code", Toast.LENGTH_LONG).show();
+                    }
                     return true;
                 }
                 return false;
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 //            }
 //        }, 0);
         String zipcode = "94704";
-        if (RepresentCalculator.verifyZipCode(zipcode)) {
+        if (RepresentCalculator.verifyZipCode(zipcode, this)) {
             toCongressionalView(zipcode);
         }
         Log.d(TAG, "non-real postal code");
@@ -120,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void findLocation(View view) {
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mApiClient);
         if (mLastLocation != null) {
-            toCongressionalView(RepresentCalculator.findZipCode(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            toCongressionalView("" + mLastLocation.getLatitude() + "," + mLastLocation.getLongitude());
             return;
         }
         Log.d(TAG, "unable to get last location");
@@ -128,12 +134,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return;
     }
 
-    public void toCongressionalView(String zipcode) {
+    public void toCongressionalView(String latlng) {
         try {
-            String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
-            ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
-            ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode, this);
-            int color = RepresentCalculator.findColor(zipcode, this);
+            RepresentCalculator.getZipCode(latlng);
+            String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
+            ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
+            ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
+            int color = RepresentCalculator.findColor(latlng, this);
 
             Intent intent = new Intent(this, CongressionalActivity.class);
             intent.putExtra("LOCATION", location[0]);

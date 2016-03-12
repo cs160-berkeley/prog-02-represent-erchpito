@@ -35,11 +35,12 @@ public class PhoneListenerService extends WearableListenerService {
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "DataMap received on phone: " + dataMap);
 
-                    String zipcode = RepresentCalculator.findRandomZipCode();
-                    String[] location = RepresentCalculator.findDistrict(zipcode).split("\n");
-                    int color = RepresentCalculator.findColor(zipcode, this);
-                    ArrayList<String> votes = RepresentCalculator.findVote(zipcode, 2012, this);
-                    ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(zipcode, this);
+                    String latlng = RepresentCalculator.getLatLng(RepresentCalculator.findRandomZipCode(this));
+                    RepresentCalculator.getZipCode(latlng);
+                    String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
+                    ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
+                    ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
+                    int color = RepresentCalculator.findColor(latlng, this);
 
                     Intent intent = new Intent(this, CongressionalActivity.class);
                     intent.putExtra("LOCATION", location[0]);
@@ -63,7 +64,7 @@ public class PhoneListenerService extends WearableListenerService {
                     Log.d(TAG, "DataMap received on phone: " + dataMap);
 
                     Intent intent = new Intent(this, DetailedActivity.class);
-                    Representative rep = RepresentCalculator.findRepresentatives(dataMap.getString("ZIP"), this).get(dataMap.getInt("INDEX"));
+                    Representative rep = RepresentCalculator.findRepresentatives(RepresentCalculator.getLatLng(dataMap.getString("ZIP")), this).get(dataMap.getInt("INDEX"));
                     intent.putExtra("REPRESENTATIVE", rep);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
