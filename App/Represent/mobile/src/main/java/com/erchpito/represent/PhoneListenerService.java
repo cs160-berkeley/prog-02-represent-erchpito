@@ -3,6 +3,7 @@ package com.erchpito.represent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,6 +16,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -41,6 +43,9 @@ public class PhoneListenerService extends WearableListenerService {
                     ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
                     ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
                     int color = RepresentCalculator.findColor(latlng, this);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    RepresentCalculator.findMap(latlng).compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                    byte[] map = stream.toByteArray();
 
                     Intent intent = new Intent(this, CongressionalActivity.class);
                     intent.putExtra("LOCATION", location[0]);
@@ -56,6 +61,7 @@ public class PhoneListenerService extends WearableListenerService {
                     serviceIntent.putExtra("REPRESENTATIVES", representatives);
                     serviceIntent.putExtra("COLOR", color);
                     serviceIntent.putExtra("VOTES", votes);
+                    serviceIntent.putExtra("MAP", map);
                     startService(serviceIntent);
 
                 } else if (path.equals("/handheld_data_detailed")) {
@@ -68,6 +74,37 @@ public class PhoneListenerService extends WearableListenerService {
                     intent.putExtra("REPRESENTATIVE", rep);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                } else if (path.equals("/handheld_data_new")) {
+
+                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    Log.d(TAG, "DataMap received on phone: " + dataMap);
+
+                    String latlng = RepresentCalculator.getLatLng(RepresentCalculator.findRandomZipCode(this));
+                    RepresentCalculator.getZipCode(latlng);
+                    String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
+                    ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
+                    ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
+                    int color = RepresentCalculator.findColor(latlng, this);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    RepresentCalculator.findMap(latlng).compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                    byte[] map = stream.toByteArray();
+
+                    Intent intent = new Intent(this, CongressionalActivity.class);
+                    intent.putExtra("LOCATION", location[0]);
+                    intent.putExtra("DISTRICT", location[1]);
+                    intent.putExtra("REPRESENTATIVES", representatives);
+                    intent.putExtra("COLOR", color);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+
+                    Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
+                    serviceIntent.putExtra("LOCATION", location[0]);
+                    serviceIntent.putExtra("DISTRICT", location[1]);
+                    serviceIntent.putExtra("REPRESENTATIVES", representatives);
+                    serviceIntent.putExtra("COLOR", color);
+                    serviceIntent.putExtra("VOTES", votes);
+                    serviceIntent.putExtra("MAP", map);
+                    startService(serviceIntent);
                 }
             }
         }

@@ -55,6 +55,7 @@ public final class RepresentCalculator {
     private static HashMap<String, String> latlngHash = new HashMap<String, String>();
     private static HashMap<String, String> zipHash = new HashMap<String, String>();
     private static HashMap<String, Boolean> verifyHash = new HashMap<String, Boolean>();
+    private static HashMap<String, Bitmap> mapHash = new HashMap<String, Bitmap>();
 
     public static int findColor(String latlng, Context context) {
         ArrayList<Representative> reps = repHash.get(latlng);
@@ -104,25 +105,18 @@ public final class RepresentCalculator {
         return districtHash.get(latlng);
     }
 
-//    public static Bitmap findMap(String latlng) {
-//        if (!mapHash.containsKey(latlng)) {
-//            try {
-//                JSONArray result = new APICallTask().execute("http://maps.googleapis.com/maps/api/staticmap?center=" + latlng + "&size=640x400&zoom=10&style=element:labels|visibility:off&style=element:geometry.stroke|visibility:off&style=feature:landscape|element:geometry|saturation:-100&style=feature:water|saturation:-100|invert_lightness:true").get().getJSONArray("results");
-//                JSONArray subresult = result.getJSONObject(0).getJSONArray("address_components");
-//                for (int i = 0; i < subresult.length(); i++) {
-//                    JSONObject subobject = subresult.getJSONObject(i);
-//                    if (subobject.getJSONArray("types").getString(0).equals("postal_code")) {
-//                        picture = subobject.getString("short_name");
-//                    }
-//                }
-//                mapHash.put(latlng, picture);
-//            } catch (Exception e) {
-//                Log.e(TAG, e.getMessage(), e);
-//            }
-//        }
-//        Log.d(TAG, "findMap(" + latlng + ") = " + mapHash.get(latlng));
-//        return mapHash.get(latlng);
-//    }
+    public static Bitmap findMap(String latlng) {
+        if (!mapHash.containsKey(latlng)) {
+            try {
+                Bitmap map = new APICallImageTask().execute("http://maps.googleapis.com/maps/api/staticmap?center=" + latlng + "&size=640x400&zoom=10&style=element:labels|visibility:off&style=element:geometry.stroke|visibility:off&style=feature:landscape|element:geometry|saturation:-100&style=feature:water|saturation:-100|invert_lightness:true").get();
+                mapHash.put(latlng, map);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+        Log.d(TAG, "findMap(" + latlng + ") = " + mapHash.get(latlng));
+        return mapHash.get(latlng);
+    }
 
     public static String findRandomZipCode(Context context) {
         if (zipcodes.isEmpty()) {
@@ -194,8 +188,8 @@ public final class RepresentCalculator {
                         }
                     }
 
-//                    rep.setMyPortrait(new APICallImageTask().execute("https://theunitedstates.io/images/congress/225x275/" + legislator.getString("bioguide_id") + ".jpg").get());
                     rep.setMyPortrait(R.drawable.boxer);
+                    rep.setMyPortraitBit(new APICallImageTask().execute("https://theunitedstates.io/images/congress/450x550/" + legislator.getString("bioguide_id") + ".jpg").get());
                     rep.setMyLastTweet("meow");
 
                     object = new Object();

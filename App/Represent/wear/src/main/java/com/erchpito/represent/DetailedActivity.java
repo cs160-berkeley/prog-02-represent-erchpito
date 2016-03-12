@@ -49,9 +49,8 @@ public class DetailedActivity extends WearableActivity {
 
         Representative rep = mRepresentative;
 
-//        mPortraitImage.setImageBitmap(rep.getMyPortrait());
-        mPortraitImage.setImageResource(rep.getMyPortrait());
-        mNameText.setText(((rep.isSenator()) ? "Sen.\n" : "Rep.\n") + rep.getMyName() + " - " + rep.getMyParty().substring(0, 1));
+        mPortraitImage.setImageBitmap(rep.getMyPortraitBit());
+        mNameText.setText(rep.getMyName() + " - " + rep.getMyParty().substring(0, 1));
 
         mField = (RelativeLayout) findViewById(R.id.field);
         int color = ContextCompat.getColor(this,  R.color.oldGloryGrey);

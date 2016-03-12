@@ -80,8 +80,7 @@ public class CongressionalActivity extends AppCompatActivity {
             website.setText(rep.getMyWebsite());
             email.setText(rep.getMyEmail());
             tweet.setText(rep.getMyLastTweet());
-//            portrait.setImageBitmap(rep.getMyPortrait());
-            portrait.setImageResource(rep.getMyPortrait());
+            portrait.setImageBitmap(rep.getMyPortraitBit());
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override

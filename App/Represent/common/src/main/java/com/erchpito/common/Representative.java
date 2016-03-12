@@ -1,11 +1,13 @@
 package com.erchpito.common;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.wearable.DataMap;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +23,7 @@ public class Representative implements Parcelable {
 
     // Picture
     private int mPortrait;
+    private Bitmap mPortraitBit;
 
     // Social
     private String mWebsite;
@@ -79,8 +82,10 @@ public class Representative implements Parcelable {
         this();
         mFirstName = in.readString();
         mLastName = in.readString();
-//        mPortrait = Bitmap.CREATOR.createFromParcel(in);
         mPortrait = in.readInt();
+        byte[] bytes = new byte[in.readInt()];
+        in.readByteArray(bytes);
+        mPortraitBit = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         mWebsite = in.readString();
         mEmail = in.readString();
         mTwitter = in.readString();
@@ -97,6 +102,8 @@ public class Representative implements Parcelable {
         this(in.getString("firstName"), in.getString("lastName"), in.getString("party"));
         mIsSenator = in.getByte("isSenator") != 0;
         mPortrait = in.getInt("portrait");
+        byte[] bytes = in.getByteArray("portraitBit");
+        mPortraitBit = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         mWebsite = "";
         mEmail = "";
         mTwitter = "";
@@ -108,6 +115,9 @@ public class Representative implements Parcelable {
         out.putString("firstName", mFirstName);
         out.putString("lastName", mLastName);
         out.putInt("portrait", mPortrait);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        mPortraitBit.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+        out.putByteArray("portraitBit", stream.toByteArray());
         out.putByte("isSenator", (byte) (mIsSenator ? 1 : 0));
         out.putString("party", mParty);
     }
@@ -116,8 +126,12 @@ public class Representative implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(mFirstName);
         out.writeString(mLastName);
-//        mPortrait.writeToParcel(out, flags);
         out.writeInt(mPortrait);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        mPortraitBit.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+        byte[] bytes = stream.toByteArray();
+        out.writeInt(bytes.length);
+        out.writeByteArray(bytes);
         out.writeString(mWebsite);
         out.writeString(mEmail);
         out.writeString(mTwitter);
@@ -155,6 +169,8 @@ public class Representative implements Parcelable {
 
     public int getMyPortrait() { return mPortrait; }
 
+    public Bitmap getMyPortraitBit() { return mPortraitBit; }
+
     public String getMyTerm() { return "Term: " + mStartTerm + " - " + mEndTerm; }
 
     public String getMyWebsite() { return mWebsite; }
@@ -165,13 +181,13 @@ public class Representative implements Parcelable {
 
     public boolean isSenator() { return mIsSenator; }
 
-    public void setMyHouse(boolean isSenator) {
-        mIsSenator = isSenator;
-    }
+    public void setMyHouse(boolean isSenator) { mIsSenator = isSenator; }
 
     public void setMyLastTweet(String tweet) { mLastTweet = tweet; }
 
     public void setMyPortrait(int bmp) { mPortrait = bmp; }
+
+    public void setMyPortraitBit(Bitmap bmp) { mPortraitBit = bmp; }
 
     public void setMySocial(String website, String email, String twitterHandle) {
         mWebsite = website;

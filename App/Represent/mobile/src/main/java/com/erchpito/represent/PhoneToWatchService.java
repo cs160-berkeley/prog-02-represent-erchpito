@@ -36,6 +36,7 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
         DATAMAP.putString("LOCATION", bundle.getString("LOCATION"));
         DATAMAP.putString("DISTRICT", bundle.getString("DISTRICT"));
         DATAMAP.putInt("COLOR", bundle.getInt("COLOR"));
+        DATAMAP.putByteArray("MAP", bundle.getByteArray("MAP"));
         ArrayList<Representative> reps = bundle.getParcelableArrayList("REPRESENTATIVES");
         ArrayList<DataMap> representatives = new ArrayList<DataMap>();
         for (Representative rep : reps) {
@@ -62,6 +63,7 @@ public class PhoneToWatchService extends Service implements GoogleApiClient.Conn
                     Log.d(TAG, "DataMap: " + DATAMAP + " sent successfully to data layer ");
                 }
                 else {
+                    Log.d(TAG, "" + result.getStatus().getStatusCode() + ": " + result.getStatus().getStatusMessage());
                     Log.d(TAG, "ERROR: failed to send DataMap to data layer");
                 }
             }

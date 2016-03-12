@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -20,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -39,6 +42,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
     private String mDistrict;
     private int mColor;
     private double accelersum;
+    private Bitmap mMap;
     private ArrayList<Representative> mRepresentatives;
     private ArrayList<String> mVotes;
 
@@ -52,6 +56,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
     private TextView mLocationText;
     private TextView mDistrictText;
     private TextView mVoteText;
+    private ImageView mLocationImage;
 
     private class RepresentativeAdapter extends WearableListView.Adapter {
 
@@ -120,6 +125,8 @@ public class MainActivity extends WearableActivity implements WearableListView.C
             mColor = bundle.getInt("COLOR");
             mRepresentatives = bundle.getParcelableArrayList("REPRESENTATIVES");
             mVotes = bundle.getStringArrayList("VOTES");
+            byte[] bytes = bundle.getByteArray("MAP");
+            mMap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         } else {
             finish();
             Log.d(TAG, "finishing Activity");
@@ -138,6 +145,9 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         mDistrictText = (TextView) findViewById(R.id.district_text);
         mDistrictText.setText(mDistrict);
         mDistrictText.setTypeface(font);
+
+        mLocationImage = (ImageView) findViewById(R.id.location_image);
+        mLocationImage.setImageBitmap(mMap);
 
         mVoteText = (TextView) findViewById(R.id.vote_text);
         String render = "";
