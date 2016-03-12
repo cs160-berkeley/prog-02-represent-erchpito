@@ -80,22 +80,7 @@ public class CongressionalActivity extends AppCompatActivity {
             website.setText(rep.getMyWebsite());
             email.setText(rep.getMyEmail());
             tweet.setText(rep.getMyLastTweet());
-//            // TODO: Use a more specific parent
-//            final ViewGroup parentView = (ViewGroup) getWindow().getDecorView().getRootView();
-//            // TODO: Base this Tweet ID on some data from elsewhere in your app
-//            long tweetId = 631879971628183552L;
-//            TweetUtils.loadTweet(tweetId, new Callback<Tweet>() {
-//                @Override
-//                public void success(Result<Tweet> result) {
-//                    TweetView tweetView = new TweetView(MainActivity.this, result.data);
-//                    parentView.addView(tweetView);
-//                }
-//                @Override
-//                public void failure(TwitterException exception) {
-//                    Log.d("TwitterKit", "Load Tweet failure", exception);
-//                }
-//            });
-
+//            portrait.setImageBitmap(rep.getMyPortrait());
             portrait.setImageResource(rep.getMyPortrait());
 
             button.setOnClickListener(new View.OnClickListener() {
@@ -126,9 +111,8 @@ public class CongressionalActivity extends AppCompatActivity {
             hsv[1] = hsv[1] + 0.1f;
             hsv[2] = hsv[2] - 0.1f;
             int argbColor = Color.HSVToColor(hsv);
-            getWindow().setStatusBarColor(Color.parseColor(String.format("#%08X", argbColor)));
-            mHomeLayout.setElevation((float) 8);
             button.setBackgroundColor(Color.parseColor(String.format("#%08X", argbColor)));
+            button.setBackgroundColor(color);
 
             return convertView;
         }

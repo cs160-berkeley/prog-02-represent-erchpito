@@ -1,5 +1,6 @@
 package com.erchpito.common;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -78,6 +79,7 @@ public class Representative implements Parcelable {
         this();
         mFirstName = in.readString();
         mLastName = in.readString();
+//        mPortrait = Bitmap.CREATOR.createFromParcel(in);
         mPortrait = in.readInt();
         mWebsite = in.readString();
         mEmail = in.readString();
@@ -114,6 +116,7 @@ public class Representative implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(mFirstName);
         out.writeString(mLastName);
+//        mPortrait.writeToParcel(out, flags);
         out.writeInt(mPortrait);
         out.writeString(mWebsite);
         out.writeString(mEmail);
@@ -168,7 +171,7 @@ public class Representative implements Parcelable {
 
     public void setMyLastTweet(String tweet) { mLastTweet = tweet; }
 
-    public void setMyPortrait(int img) { mPortrait = img; }
+    public void setMyPortrait(int bmp) { mPortrait = bmp; }
 
     public void setMySocial(String website, String email, String twitterHandle) {
         mWebsite = website;

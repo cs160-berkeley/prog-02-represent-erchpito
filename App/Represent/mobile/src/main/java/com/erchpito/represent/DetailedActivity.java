@@ -68,6 +68,7 @@ public class DetailedActivity extends AppCompatActivity {
 
         Representative rep = mRepresentative;
 
+//        mPortraitImage.setImageBitmap(rep.getMyPortrait());
         mPortraitImage.setImageResource(rep.getMyPortrait());
         mNameText.setText(((rep.isSenator()) ? "Sen. " : "Rep. ") + rep.getMyName());
         mPartyText.setText(rep.getMyParty());

@@ -1,5 +1,6 @@
 package com.erchpito.represent;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -108,7 +109,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return;
     }
 
-    public void toCongressionalView(String latlng) {
+    public void toCongressionalView(final String latlng) {
+        mCurrentButton.setText("Loading...");
         try {
             RepresentCalculator.getZipCode(latlng);
             String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
@@ -132,8 +134,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Log.d(TAG, "starting service");
             startService(serviceIntent);
         } catch (Exception e) {
-            Toast.makeText(this, "Unable to retrieve data", Toast.LENGTH_LONG).show();
+            Log.e(TAG, e.getMessage(), e);
+            Log.d(TAG, "unable to get information");
+            Toast.makeText(this, "Unable to get information", Toast.LENGTH_LONG).show();
         }
+        mCurrentButton.setText("Use Current Location");
     }
 
     @Override

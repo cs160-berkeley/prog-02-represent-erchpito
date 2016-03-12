@@ -2,6 +2,7 @@ package com.erchpito.represent;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -21,8 +22,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -190,6 +194,7 @@ public final class RepresentCalculator {
                         }
                     }
 
+//                    rep.setMyPortrait(new APICallImageTask().execute("https://theunitedstates.io/images/congress/225x275/" + legislator.getString("bioguide_id") + ".jpg").get());
                     rep.setMyPortrait(R.drawable.boxer);
                     rep.setMyLastTweet("meow");
 

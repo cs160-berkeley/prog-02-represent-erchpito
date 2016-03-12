@@ -49,6 +49,7 @@ public class DetailedActivity extends WearableActivity {
 
         Representative rep = mRepresentative;
 
+//        mPortraitImage.setImageBitmap(rep.getMyPortrait());
         mPortraitImage.setImageResource(rep.getMyPortrait());
         mNameText.setText(((rep.isSenator()) ? "Sen.\n" : "Rep.\n") + rep.getMyName() + " - " + rep.getMyParty().substring(0, 1));
 
