@@ -113,10 +113,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void toCongressionalView(String latlng) {
         mCurrentButton.setText("Loading...");
-        Intent serviceIntent = new Intent(this, PhoneToPhoneService.class);
-        serviceIntent.putExtra("ACTION", "new");
-        serviceIntent.putExtra("LATLNG", latlng);
-        startService(serviceIntent);
+        try {
+            Intent serviceIntent = new Intent(this, PhoneToPhoneService.class);
+            serviceIntent.putExtra("ACTION", "new");
+            serviceIntent.putExtra("LATLNG", latlng);
+            startService(serviceIntent);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 
     @Override
