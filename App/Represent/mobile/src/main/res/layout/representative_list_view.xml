@@ -70,6 +70,9 @@
             android:layout_below="@id/list_view_email"
 
             android:textSize="12dp"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:singleLine="false"
             android:text="lee.house.gov" />
     </RelativeLayout>
 

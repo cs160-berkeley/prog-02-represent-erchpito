@@ -2,7 +2,6 @@ package com.erchpito.represent;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -22,11 +21,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,8 +40,6 @@ public final class RepresentCalculator {
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "yj6GsqrlTzwAVqEEahPSYFtZs";
     private static final String TWITTER_SECRET = "KJkdLmgO3zc6w8A0kRCcpZV4YIXTY9Xe2BKS6h2zuEEMLv12aW";
-
-    private static Object object;
 
     private static ArrayList<String> zipcodes = new ArrayList<String>();
 
@@ -154,6 +148,16 @@ public final class RepresentCalculator {
         return randomZip;
     }
 
+    private static String getFirstWord(String sentence) {
+        if (sentence.indexOf(' ') > -1) {
+            sentence = sentence.substring(0, sentence.indexOf(' '));
+        }
+        if (sentence.indexOf('-') > -1) {
+            sentence = sentence.substring(0, sentence.indexOf('-'));
+        }
+        return sentence;
+    }
+
     public static ArrayList<Representative> findRepresentatives(String latlng, Context context) {
         if (!repHash.containsKey(latlng)) {
             try {
@@ -165,7 +169,7 @@ public final class RepresentCalculator {
                 JSONArray result = new APICallTask().execute("https://congress.api.sunlightfoundation.com/legislators/locate?" + "latitude=" + coord[0] + "&longitude=" + coord[1]).get().getJSONArray("results");
                 for (int i = 0; i < result.length(); i++) {
                     JSONObject legislator = result.getJSONObject(i);
-                    final Representative rep = new Representative(legislator.getString("first_name"), legislator.getString("last_name"), legislator.getString("party")); // party is just D or R
+                    final Representative rep = new Representative(getFirstWord(legislator.getString("first_name")), getFirstWord(legislator.getString("last_name")), legislator.getString("party")); // party is just D or R
                     rep.setMyHouse(legislator.getString("chamber").equals("senate"));
                     rep.setMyTerm(legislator.getString("term_start"), legislator.getString("term_end"));
                     rep.setMySocial(legislator.getString("website"), legislator.getString("oc_email"), legislator.getString("twitter_id")); // twitter_id sans @
@@ -192,8 +196,6 @@ public final class RepresentCalculator {
                     rep.setMyPortraitBit(new APICallImageTask().execute("https://theunitedstates.io/images/congress/450x550/" + legislator.getString("bioguide_id") + ".jpg").get());
                     rep.setMyLastTweet("meow");
 
-                    object = new Object();
-
                     TwitterCore.getInstance().logInGuest(new Callback<AppSession>() {
                         @Override
                         public void success(Result<AppSession> appSessionResult) {
@@ -205,18 +207,12 @@ public final class RepresentCalculator {
                                     for (Tweet tweet : listResult.data) {
                                         rep.setMyLastTweet(tweet.text);
                                         Log.d("fabricstuff", "result: " + tweet.text + "  " + tweet.createdAt);
-                                        synchronized (object) {
-                                            object.notifyAll();
-                                        }
                                     }
                                 }
 
                                 @Override
                                 public void failure(TwitterException e) {
                                     e.printStackTrace();
-                                    synchronized (object) {
-                                        object.notifyAll();
-                                    }
                                 }
                             });
                         }
@@ -224,20 +220,8 @@ public final class RepresentCalculator {
                         @Override
                         public void failure(TwitterException e) {
                             e.printStackTrace();
-                            synchronized (object) {
-                                object.notifyAll();
-                            }
                         }
                     });
-
-//                    synchronized (object) {
-//                        try {
-//                            object.wait();
-//                            Log.d(TAG, "meow " + rep.getMyLastTweet());
-//                        } catch (InterruptedException e) {
-//                            Log.e("Message", "Interrupted Exception while getting lock" + e.getMessage());
-//                        }
-//                    }
 
                     output.add(rep);
                 }
@@ -255,13 +239,7 @@ public final class RepresentCalculator {
             try {
                 String countyName = "";
                 JSONArray result = new APICallTask().execute("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&result_type=administrative_area_level_2").get().getJSONArray("results");
-                JSONArray subresult = result.getJSONObject(0).getJSONArray("address_components");
-                for (int i = 0; i < subresult.length(); i++) {
-                    JSONObject subobject = subresult.getJSONObject(i);
-                    if (subobject.getJSONArray("types").getString(0).equals("administrative_area_level_2")) {
-                        countyName = subobject.getString("short_name");
-                    }
-                }
+                countyName = result.getJSONObject(0).getString("formatted_address");
 
                 ArrayList<String> output = new ArrayList<String>();
                 InputStream inputStream = context.getAssets().open("election-county-2012.json");
@@ -271,10 +249,10 @@ public final class RepresentCalculator {
                 JSONArray read = new JSONArray(new String(buffer, "UTF-8"));
                 for (int i = 0; i < read.length(); i++) {
                     JSONObject countyResult = read.getJSONObject(i);
-                    if (countyName.contains(countyResult.getString("county-name"))) {
+                    if (countyName.equals(countyResult.getString("county-name") + " County, " + countyResult.getString("state-postal") + ", USA")) {
                         output.add(countyResult.getString("county-name") + " County, " + countyResult.getString("state-postal"));
-                        Double obama = countyResult.getDouble("obama-percentage"); // might not always have the same format of XX.X
-                        Double romney = countyResult.getDouble("romney-percentage"); // might not always have the same format of XX.X
+                        Double obama = countyResult.getDouble("obama-percentage");
+                        Double romney = countyResult.getDouble("romney-percentage");
                         if (obama >= romney) {
                             output.add("Obama: " + obama + "%");
                             output.add("Romney: " + romney + "%");

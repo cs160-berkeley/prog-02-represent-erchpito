@@ -152,7 +152,6 @@ public class CongressionalActivity extends AppCompatActivity {
         hsv[2] = hsv[2] - 0.1f;
         int argbColor = Color.HSVToColor(hsv);
         getWindow().setStatusBarColor(Color.parseColor(String.format("#%08X", argbColor)));
-        mHomeLayout.setElevation((float) 8);
     }
 
 }

@@ -36,33 +36,44 @@ public class PhoneListenerService extends WearableListenerService {
 
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "DataMap received on phone: " + dataMap);
-                    String latlng = (path.equals("/handheld_data_new")) ? dataMap.getString("LATLNG") : RepresentCalculator.getLatLng(RepresentCalculator.findRandomZipCode(this));
-                    
-                    RepresentCalculator.getZipCode(latlng);
-                    String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
-                    ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
-                    ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
-                    int color = RepresentCalculator.findColor(latlng, this);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    RepresentCalculator.findMap(latlng).compress(Bitmap.CompressFormat.JPEG, 50, stream);
-                    byte[] map = stream.toByteArray();
+                    try {
+                        String latlng = (path.equals("/handheld_data_new")) ? dataMap.getString("LATLNG") : RepresentCalculator.getLatLng(RepresentCalculator.findRandomZipCode(this));
 
-                    Intent intent = new Intent(this, CongressionalActivity.class);
-                    intent.putExtra("LOCATION", location[0]);
-                    intent.putExtra("DISTRICT", location[1]);
-                    intent.putExtra("REPRESENTATIVES", representatives);
-                    intent.putExtra("COLOR", color);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                        RepresentCalculator.getZipCode(latlng);
+                        String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
+                        ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
+                        ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
+                        int color = RepresentCalculator.findColor(latlng, this);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        RepresentCalculator.findMap(latlng).compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                        byte[] map = stream.toByteArray();
 
-                    Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
-                    serviceIntent.putExtra("LOCATION", location[0]);
-                    serviceIntent.putExtra("DISTRICT", location[1]);
-                    serviceIntent.putExtra("REPRESENTATIVES", representatives);
-                    serviceIntent.putExtra("COLOR", color);
-                    serviceIntent.putExtra("VOTES", votes);
-                    serviceIntent.putExtra("MAP", map);
-                    startService(serviceIntent);
+                        Intent intent = new Intent(this, CongressionalActivity.class);
+                        intent.putExtra("LOCATION", location[0]);
+                        intent.putExtra("DISTRICT", location[1]);
+                        intent.putExtra("REPRESENTATIVES", representatives);
+                        intent.putExtra("COLOR", color);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+
+                        Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
+                        serviceIntent.putExtra("LOCATION", location[0]);
+                        serviceIntent.putExtra("DISTRICT", location[1]);
+                        serviceIntent.putExtra("REPRESENTATIVES", representatives);
+                        serviceIntent.putExtra("COLOR", color);
+                        serviceIntent.putExtra("VOTES", votes);
+                        serviceIntent.putExtra("MAP", map);
+                        startService(serviceIntent);
+                    } catch (Exception e) {
+                        if (path.equals("/handheld_data_new")) {
+                            Intent broadcast = new Intent();
+                            broadcast.setAction("REQUEST_ERROR");
+                            sendBroadcast(broadcast);
+                            Log.d(TAG, "sent error broadcast");
+                        } else {
+                            Log.e(TAG, e.getMessage(), e);
+                        }
+                    }
 
                 } else if (path.equals("/handheld_data_detailed")) {
 

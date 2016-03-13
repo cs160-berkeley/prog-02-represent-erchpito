@@ -7,7 +7,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -77,17 +80,34 @@ public class DetailedActivity extends AppCompatActivity {
         mEmailButton.setText("Email");
         mEmail = rep.getMyEmail();
 
-
-        String render = "";
-        render += "Committees:\n\n";
+        CharSequence render = "";
+        SpannableString ss = new SpannableString("Committees:");
+        ss.setSpan(new RelativeSizeSpan(2f), 0, ss.length(), 0);
+        render = TextUtils.concat(render, ss, "\n\n");
         for (int i = 0; i < rep.getNumCommittees(); i++) {
-            render += rep.getMyCommittees(i) + "\n";
+            render = TextUtils.concat(render, rep.getMyCommittees(i), "\n");
         }
-        render += "\nSponsored Bills:\n\n";
+        ss = new SpannableString("Sponsored Bills:");
+        ss.setSpan(new RelativeSizeSpan(2f), 0, ss.length(), 0);
+        render = TextUtils.concat(render, "\n", ss, "\n\n");
         for (int i = 0; i < rep.getNumBills(); i++) {
-            render += rep.getMyBills(i) + "\n\n";
+            String[] billInfo = rep.getMyBills(i).split("\n");
+            ss = new SpannableString(billInfo[1]);
+            ss.setSpan(new RelativeSizeSpan(0.9f), 0, ss.length(), 0);
+            render = TextUtils.concat(render, billInfo[0], "\n", ss, "\n\n");
         }
         mCareerText.setText(render);
+
+//        String render = "";
+//        render += "Committees:\n\n";
+//        for (int i = 0; i < rep.getNumCommittees(); i++) {
+//            render += rep.getMyCommittees(i) + "\n";
+//        }
+//        render += "\nSponsored Bills:\n\n";
+//        for (int i = 0; i < rep.getNumBills(); i++) {
+//            render += rep.getMyBills(i) + "\n\n";
+//        }
+//        mCareerText.setText(render);
 
         mHomeLayout = (RelativeLayout) findViewById(R.id.home);
         int color = ContextCompat.getColor(this,  R.color.oldGloryGrey);
@@ -116,8 +136,8 @@ public class DetailedActivity extends AppCompatActivity {
     public void onClick(View view) {
         if (view.getId() == mEmailButton.getId()) {
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mEmail, null));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-            emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Greetings, Representative");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, "Hello, " + mNameText.getText().toString());
             startActivity(Intent.createChooser(emailIntent, "Send email..."));
         } else if (view.getId() == mWebsiteButton.getId()) {
             Intent i = new Intent(Intent.ACTION_VIEW);

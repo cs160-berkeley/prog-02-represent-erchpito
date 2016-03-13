@@ -1,14 +1,13 @@
 package com.erchpito.represent;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -20,30 +19,22 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.erchpito.common.Representative;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
 
-    private int mAnimationDuration;
-
     private Typeface font;
-
-    private RelativeLayout mButtonField;
 
     private TextView mRepresentText;
     private TextView mInfoText;
     private EditText mZipEdit;
-    private Button mCurrentButton;
+    private static Button mCurrentButton;
+
+    private BroadcastReceiver mReceiver;
 
     private GoogleApiClient mApiClient;
 
@@ -53,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
 
         font = Typeface.createFromAsset(getAssets(), "fonts/LeagueSpartan-Bold.otf");
-        mAnimationDuration = getResources().getInteger(android.R.integer.config_longAnimTime);
 
         mRepresentText = (TextView) findViewById(R.id.represent_text);
         mRepresentText.setTypeface(font);
@@ -66,13 +56,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         mZipEdit = (EditText) findViewById(R.id.zip_edit);
         mZipEdit.setTypeface(font);
-//        mZipEdit.setVisibility(View.GONE);
         mZipEdit.setFocusableInTouchMode(true);
         mZipEdit.setHintTextColor(ContextCompat.getColor(this, R.color.white));
         mZipEdit.requestFocus();
         mZipEdit.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // If the event is a key-down event on the "enter" button
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     String zipcode = mZipEdit.getText().toString();
                     if (RepresentCalculator.verifyZipCode(zipcode, v.getContext())) {
@@ -100,6 +88,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         hsv[2] = hsv[2] - 0.1f;
         int argbColor = Color.HSVToColor(hsv);
         getWindow().setStatusBarColor(Color.parseColor(String.format("#%08X", argbColor)));
+
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "received broadcast");
+                mCurrentButton.setText("Use Current Location");
+                Log.d(TAG, "unable to get information");
+                Toast.makeText(getApplicationContext(), "Unable to get information", Toast.LENGTH_LONG).show();
+            }
+        };
     }
 
     public void findLocation(View view) {
@@ -119,60 +117,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         serviceIntent.putExtra("ACTION", "new");
         serviceIntent.putExtra("LATLNG", latlng);
         startService(serviceIntent);
-//        RepresentCalculator.getZipCode(latlng);
-//        String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
-//        ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
-//        ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
-//        int color = RepresentCalculator.findColor(latlng, this);
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        RepresentCalculator.findMap(latlng).compress(Bitmap.CompressFormat.JPEG, 50, stream);
-//        byte[] map = stream.toByteArray();
-//
-//        Intent intent = new Intent(this, CongressionalActivity.class);
-//        intent.putExtra("LOCATION", location[0]);
-//        intent.putExtra("DISTRICT", location[1]);
-//        intent.putExtra("REPRESENTATIVES", representatives);
-//        intent.putExtra("COLOR", color);
-//        Log.d(TAG, "starting activity");
-//        startActivity(intent);
-//
-//        Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
-//        serviceIntent.putExtra("LOCATION", location[0]);
-//        serviceIntent.putExtra("DISTRICT", location[1]);
-//        serviceIntent.putExtra("REPRESENTATIVES", representatives);
-//        serviceIntent.putExtra("COLOR", color);
-//        serviceIntent.putExtra("VOTES", votes);
-//        serviceIntent.putExtra("MAP", map);
-//        Log.d(TAG, "starting service");
-//        startService(serviceIntent);
-//        try {
-//            RepresentCalculator.getZipCode(latlng);
-//            String[] location = RepresentCalculator.findDistrict(latlng).split("\n");
-//            ArrayList<String> votes = RepresentCalculator.findVote(latlng, 2012, this);
-//            ArrayList<Representative> representatives = RepresentCalculator.findRepresentatives(latlng, this);
-//            int color = RepresentCalculator.findColor(latlng, this);
-//
-//            Intent intent = new Intent(this, CongressionalActivity.class);
-//            intent.putExtra("LOCATION", location[0]);
-//            intent.putExtra("DISTRICT", location[1]);
-//            intent.putExtra("REPRESENTATIVES", representatives);
-//            intent.putExtra("COLOR", color);
-//            startActivity(intent);
-//
-//            Intent serviceIntent = new Intent(this, PhoneToWatchService.class);
-//            serviceIntent.putExtra("LOCATION", location[0]);
-//            serviceIntent.putExtra("DISTRICT", location[1]);
-//            serviceIntent.putExtra("REPRESENTATIVES", representatives);
-//            serviceIntent.putExtra("COLOR", color);
-//            serviceIntent.putExtra("VOTES", votes);
-//            Log.d(TAG, "starting service");
-//            startService(serviceIntent);
-//        } catch (Exception e) {
-//            Log.e(TAG, e.getMessage(), e);
-//            Log.d(TAG, "unable to get information");
-//            Toast.makeText(this, "Unable to get information", Toast.LENGTH_LONG).show();
-//        }
-        mCurrentButton.setText("Use Current Location");
     }
 
     @Override
@@ -186,6 +130,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onStop() {
         super.onStop();
         mApiClient.disconnect();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("REQUEST_ERROR");
+        registerReceiver(mReceiver, filter);
+        mCurrentButton.setText("Use Current Location");
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(mReceiver);
+        super.onPause();
     }
 
     @Override

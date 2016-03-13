@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="20dp"
-        android:padding="20dp" >
+        android:padding="20dp">
 
         <TextView android:id="@+id/name_text"
             android:layout_width="match_parent"
@@ -57,7 +57,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/portrait_image"
         android:elevation="8dp"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:clipToPadding="false">
 
         <Button android:id="@+id/website_text"
             android:layout_width="wrap_content"
@@ -70,7 +71,7 @@
             android:text="Website"
             android:elevation="10dp"
             android:padding="15dp"
-            android:onClick="onClick"/>
+            android:onClick="onClick" />
 
         <Button android:id="@+id/email_text"
             android:layout_width="wrap_content"
@@ -83,7 +84,7 @@
             android:text="potatopotatopotatopotato"
             android:padding="15dp"
             android:elevation="10dp"
-            android:onClick="onClick"/>
+            android:onClick="onClick" />
 
     </RelativeLayout>
 
@@ -93,7 +94,8 @@
 
         android:layout_below="@id/social_field"
 
-        android:padding="6dip"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:textSize="12sp"
         android:scrollbars = "vertical"
         android:text="13th Congressional District"/>

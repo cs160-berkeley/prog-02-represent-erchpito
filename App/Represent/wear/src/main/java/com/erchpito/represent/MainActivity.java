@@ -50,7 +50,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
     private SensorManager mSensorManager;
     private Sensor mSensor;
 
-    private WearableListView mRepresentativeList;
+    private WearableListViewFixEditor mRepresentativeList;
     private RelativeLayout mLocationField;
     private RelativeLayout mHomeLayout;
     private TextView mLocationText;
@@ -58,7 +58,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
     private TextView mVoteText;
     private ImageView mLocationImage;
 
-    private class RepresentativeAdapter extends WearableListView.Adapter {
+    private class RepresentativeAdapter extends WearableListViewFixEditor.Adapter {
 
         private Context mContext;
         private LayoutInflater mInflater;
@@ -69,7 +69,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         }
 
         // Provide a reference to the type of views you're using
-        public class ItemViewHolder extends WearableListView.ViewHolder {
+        public class ItemViewHolder extends WearableListViewFixEditor.ViewHolder {
             private TextView mName;
             public ItemViewHolder(View itemView) {
                 super(itemView);
@@ -81,7 +81,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         // Create new views for list items
         // (invoked by the WearableListView's layout manager)
         @Override
-        public WearableListView.ViewHolder onCreateViewHolder(ViewGroup parent,
+        public WearableListViewFixEditor.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                               int viewType) {
             // Inflate our custom layout for list items
             return new ItemViewHolder(mInflater.inflate(R.layout.representative_list_view, null));
@@ -91,7 +91,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         // Instead of creating new views, the list tries to recycle existing ones
         // (invoked by the WearableListView's layout manager)
         @Override
-        public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
+        public void onBindViewHolder(WearableListViewFixEditor.ViewHolder holder, int position) {
             // retrieve the text view
             ItemViewHolder itemHolder = (ItemViewHolder) holder;
             TextView name = itemHolder.mName;
@@ -172,7 +172,7 @@ public class MainActivity extends WearableActivity implements WearableListView.C
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        mRepresentativeList = (WearableListView) findViewById(R.id.representative_list);
+        mRepresentativeList = (WearableListViewFixEditor) findViewById(R.id.representative_list);
         mRepresentativeAdapter = new RepresentativeAdapter(this);
         mRepresentativeList.setAdapter(mRepresentativeAdapter);
         mRepresentativeList.setClickListener(this);

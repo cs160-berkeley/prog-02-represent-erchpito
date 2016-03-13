@@ -5,20 +5,20 @@
     android:background="@color/colorPrimary"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
     tools:context="com.erchpito.represent.CongressionalActivity"
     tools:showIn="@layout/activity_congressional">
 
     <RelativeLayout android:id="@+id/field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="8dp">
+        android:elevation="8dp"
+        android:padding="20dp">
 
         <TextView android:id="@+id/location_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:paddingTop="10dip"
-            android:paddingLeft="20dip"
             android:textSize="40sp"
             android:text="CA, 94704"/>
 
@@ -28,8 +28,6 @@
 
             android:layout_below="@id/location_text"
 
-            android:paddingLeft="20dip"
-            android:paddingBottom="10dip"
             android:textSize="15dp"
             android:text="13th Congressional District"/>
 
